@@ -1,4 +1,5 @@
 import './index.css';
+import { Dashboard } from './components/Dashboard';
 
 function App() {
   return (
@@ -23,12 +24,8 @@ function App() {
           <p className="page-subtitle">Welcome back. Here is your overview for today.</p>
         </header>
 
-        {/* Example Content */}
-        <div className="card">
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            We're building a highly professional, utilitarian interface. No gradients, no glowing AI blobs, just flat colors, sharp borders, and high contrast data density.
-          </p>
-        </div>
+        {/* Dynamic Content */}
+        <Dashboard />
       </main>
     </div>
   );
