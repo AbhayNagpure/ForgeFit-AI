@@ -1,64 +1,32 @@
 import { useState } from 'react';
 import './index.css';
-import { Dashboard } from './components/Dashboard';
-import { AddWorkout } from './components/AddWorkout';
-import { AICoach } from './components/AICoach';
+import { Sidebar } from './components/layout/Sidebar';
+import { Header } from './components/layout/Header';
+import { Dashboard } from './features/dashboard/Dashboard';
+import { AddWorkout } from './features/workouts/AddWorkout';
+import { AICoach } from './features/ai-coach/AICoach';
+import { Nutrition } from './features/nutrition/Nutrition';
+import { Settings } from './features/settings/Settings';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
     <div className="app-container">
-      {/* Sidebar Navigation */}
-      <aside className="sidebar">
-        <div className="brand">ForgeFit</div>
-        
-        <nav>
-          <button 
-            className={`nav-link ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-            style={{ width: '100%', textAlign: 'left' }}
-          >
-            Dashboard
-          </button>
-          <button 
-            className={`nav-link ${activeTab === 'workouts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('workouts')}
-            style={{ width: '100%', textAlign: 'left' }}
-          >
-            Workouts
-          </button>
-          <button 
-            className={`nav-link ${activeTab === 'coach' ? 'active' : ''}`}
-            onClick={() => setActiveTab('coach')}
-            style={{ width: '100%', textAlign: 'left' }}
-          >
-            AI Coach
-          </button>
-          <button className="nav-link" style={{ width: '100%', textAlign: 'left' }}>Nutrition</button>
-          <button className="nav-link" style={{ width: '100%', textAlign: 'left' }}>Settings</button>
-        </nav>
-      </aside>
+      {/* Extracted Sidebar Layout */}
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
       <main className="main-content">
-        <header className="page-header">
-          <h1 className="page-title">
-            {activeTab === 'dashboard' && 'Dashboard'}
-            {activeTab === 'workouts' && 'Workouts'}
-            {activeTab === 'coach' && 'AI Personal Coach'}
-          </h1>
-          <p className="page-subtitle">
-            {activeTab === 'dashboard' && 'Welcome back. Here is your overview for today.'}
-            {activeTab === 'workouts' && 'Log and track your training sessions.'}
-            {activeTab === 'coach' && 'Ask your AI coach to analyze your data and build routines.'}
-          </p>
-        </header>
+        {/* Extracted Header Layout */}
+        <Header activeTab={activeTab} />
 
-        {/* Dynamic Content */}
+        {/* Feature-Based Dynamic Content */}
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'workouts' && <AddWorkout />}
+        {activeTab === 'nutrition' && <Nutrition />}
         {activeTab === 'coach' && <AICoach />}
+        {activeTab === 'settings' && <Settings />}
       </main>
     </div>
   );

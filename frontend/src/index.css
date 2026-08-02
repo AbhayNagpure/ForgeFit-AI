@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Utilitarian, flat, professional dark mode (Linear/Vercel aesthetic) */
+  /* Utilitarian, flat, professional dark mode */
   --bg-page: #000000;
   --bg-surface: #0a0a0a;
   --bg-surface-hover: #171717;
@@ -12,7 +12,6 @@
   --text-primary: #ededed;
   --text-secondary: #a1a1aa;
   
-  /* Single, solid accent color (Emerald for fitness/health). No gradients. */
   --accent: #10b981;
   --accent-hover: #059669;
   
@@ -34,7 +33,6 @@ body {
   line-height: 1.5;
 }
 
-/* Base UI Elements */
 a {
   color: inherit;
   text-decoration: none;
@@ -88,12 +86,7 @@ button {
   transition: all 0.15s ease;
 }
 
-.nav-link:hover {
-  background-color: var(--bg-surface-hover);
-  color: var(--text-primary);
-}
-
-.nav-link.active {
+.nav-link:hover, .nav-link.active {
   background-color: var(--bg-surface-hover);
   color: var(--text-primary);
 }
@@ -114,7 +107,7 @@ button {
   font-size: 0.8125rem;
 }
 
-/* Card Component (Flat, solid border, no shadow) */
+/* Cards */
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
@@ -122,7 +115,7 @@ button {
   padding: 16px 20px;
 }
 
-/* Dashboard Specific Layouts */
+/* Dashboard Grids */
 .dashboard-layout {
   display: flex;
   flex-direction: column;
@@ -171,6 +164,22 @@ button {
   padding-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Nutrition Progress Bars */
+.macro-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.macro-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 /* Chart Placeholder */
@@ -251,7 +260,7 @@ button {
 }
 
 .form-group label {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -260,7 +269,7 @@ button {
   background-color: var(--bg-page);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-radius: 4px;
   font-family: inherit;
   font-size: 0.875rem;
@@ -301,6 +310,11 @@ textarea.form-control {
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+  background-color: var(--border-focus);
+  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -351,7 +365,7 @@ textarea.form-control {
 .message-bubble {
   padding: 12px 16px;
   border-radius: var(--radius);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
@@ -393,7 +407,6 @@ textarea.form-control {
     flex-direction: column;
   }
 
-  /* Make sidebar a horizontal scrolling top-nav on mobile */
   .sidebar {
     width: 100%;
     border-right: none;
@@ -405,7 +418,7 @@ textarea.form-control {
     display: flex;
     overflow-x: auto;
     gap: 8px;
-    padding-bottom: 8px; /* Room for scrollbar if needed */
+    padding-bottom: 8px;
   }
 
   .sidebar .nav-link {
