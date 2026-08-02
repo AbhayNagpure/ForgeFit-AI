@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import './index.css';
 import { Dashboard } from './components/Dashboard';
+import { AddWorkout } from './components/AddWorkout';
+import { AICoach } from './components/AICoach';
 
 function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
@@ -9,23 +14,51 @@ function App() {
         <div className="brand">ForgeFit</div>
         
         <nav>
-          <a href="#" className="nav-link active">Dashboard</a>
-          <a href="#" className="nav-link">Workouts</a>
-          <a href="#" className="nav-link">Nutrition</a>
-          <a href="#" className="nav-link">Analytics</a>
-          <a href="#" className="nav-link">Settings</a>
+          <button 
+            className={`nav-link ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+            style={{ width: '100%', textAlign: 'left' }}
+          >
+            Dashboard
+          </button>
+          <button 
+            className={`nav-link ${activeTab === 'workouts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('workouts')}
+            style={{ width: '100%', textAlign: 'left' }}
+          >
+            Workouts
+          </button>
+          <button 
+            className={`nav-link ${activeTab === 'coach' ? 'active' : ''}`}
+            onClick={() => setActiveTab('coach')}
+            style={{ width: '100%', textAlign: 'left' }}
+          >
+            AI Coach
+          </button>
+          <button className="nav-link" style={{ width: '100%', textAlign: 'left' }}>Nutrition</button>
+          <button className="nav-link" style={{ width: '100%', textAlign: 'left' }}>Settings</button>
         </nav>
       </aside>
 
       {/* Main Content Area */}
       <main className="main-content">
         <header className="page-header">
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Welcome back. Here is your overview for today.</p>
+          <h1 className="page-title">
+            {activeTab === 'dashboard' && 'Dashboard'}
+            {activeTab === 'workouts' && 'Workouts'}
+            {activeTab === 'coach' && 'AI Personal Coach'}
+          </h1>
+          <p className="page-subtitle">
+            {activeTab === 'dashboard' && 'Welcome back. Here is your overview for today.'}
+            {activeTab === 'workouts' && 'Log and track your training sessions.'}
+            {activeTab === 'coach' && 'Ask your AI coach to analyze your data and build routines.'}
+          </p>
         </header>
 
         {/* Dynamic Content */}
-        <Dashboard />
+        {activeTab === 'dashboard' && <Dashboard />}
+        {activeTab === 'workouts' && <AddWorkout />}
+        {activeTab === 'coach' && <AICoach />}
       </main>
     </div>
   );
