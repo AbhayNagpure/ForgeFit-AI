@@ -64,14 +64,14 @@ button {
 
 .main-content {
   flex: 1;
-  padding: 40px;
+  padding: 24px 32px;
   background-color: var(--bg-page);
 }
 
 .brand {
   font-weight: 700;
-  font-size: 1.25rem;
-  margin-bottom: 32px;
+  font-size: 1.125rem;
+  margin-bottom: 24px;
   padding-left: 8px;
   letter-spacing: -0.02em;
 }
@@ -79,11 +79,11 @@ button {
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 8px;
+  padding: 6px 12px;
   margin-bottom: 4px;
   border-radius: var(--radius);
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: all 0.15s ease;
 }
@@ -99,19 +99,19 @@ button {
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .page-subtitle {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 /* Card Component (Flat, solid border, no shadow) */
@@ -119,34 +119,36 @@ button {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 16px 20px;
 }
 
 /* Dashboard Specific Layouts */
 .dashboard-layout {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
 }
 
 .stat-label {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .stat-change {
@@ -158,24 +160,26 @@ button {
 .dashboard-columns {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 24px;
+  gap: 16px;
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 12px;
+  padding-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Chart Placeholder */
 .chart-placeholder {
   display: flex;
   align-items: flex-end;
-  height: 200px;
-  gap: 12px;
-  padding-top: 20px;
+  height: 160px;
+  gap: 8px;
+  padding-top: 16px;
 }
 
 .chart-placeholder .bar {
@@ -205,17 +209,235 @@ button {
 
 .workout-name {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .workout-date {
   color: var(--text-secondary);
   font-size: 0.75rem;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .workout-duration {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+/* Forms & Inputs */
+.add-workout-container {
+  max-width: 600px;
+}
+
+.workout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-control {
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+/* AI Coach Chat */
+.ai-coach-container {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  max-width: 800px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-history {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-message {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat-message.ai {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.message-bubble {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.chat-message.user .message-bubble {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+  border-bottom-right-radius: 0;
+}
+
+.chat-message.ai .message-bubble {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--text-primary);
+  border-bottom-left-radius: 0;
+}
+
+.message-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.chat-input-area {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  gap: 12px;
+}
+
+.chat-input {
+  flex: 1;
+}
+
+/* 📱 Responsive Design / Mobile Layout */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  /* Make sidebar a horizontal scrolling top-nav on mobile */
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 8px; /* Room for scrollbar if needed */
+  }
+
+  .sidebar .nav-link {
+    white-space: nowrap;
+    width: auto !important;
+    text-align: center !important;
+    padding: 8px 16px;
+  }
+
+  .brand {
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .main-content {
+    padding: 20px 16px;
+  }
+
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ai-coach-container {
+    height: 70vh;
+  }
+
+  .chat-message {
+    max-width: 90%;
+  }
 }
