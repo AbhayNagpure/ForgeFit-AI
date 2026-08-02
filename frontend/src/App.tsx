@@ -1,31 +1,32 @@
+import { useState } from 'react';
 import './index.css';
-import { Dashboard } from './components/Dashboard';
+import { Sidebar } from './components/layout/Sidebar';
+import { Header } from './components/layout/Header';
+import { Dashboard } from './features/dashboard/Dashboard';
+import { AddWorkout } from './features/workouts/AddWorkout';
+import { AICoach } from './features/ai-coach/AICoach';
+import { Nutrition } from './features/nutrition/Nutrition';
+import { Settings } from './features/settings/Settings';
 
 function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   return (
     <div className="app-container">
-      {/* Sidebar Navigation */}
-      <aside className="sidebar">
-        <div className="brand">ForgeFit</div>
-        
-        <nav>
-          <a href="#" className="nav-link active">Dashboard</a>
-          <a href="#" className="nav-link">Workouts</a>
-          <a href="#" className="nav-link">Nutrition</a>
-          <a href="#" className="nav-link">Analytics</a>
-          <a href="#" className="nav-link">Settings</a>
-        </nav>
-      </aside>
+      {/* Extracted Sidebar Layout */}
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
       <main className="main-content">
-        <header className="page-header">
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Welcome back. Here is your overview for today.</p>
-        </header>
+        {/* Extracted Header Layout */}
+        <Header activeTab={activeTab} />
 
-        {/* Dynamic Content */}
-        <Dashboard />
+        {/* Feature-Based Dynamic Content */}
+        {activeTab === 'dashboard' && <Dashboard />}
+        {activeTab === 'workouts' && <AddWorkout />}
+        {activeTab === 'nutrition' && <Nutrition />}
+        {activeTab === 'coach' && <AICoach />}
+        {activeTab === 'settings' && <Settings />}
       </main>
     </div>
   );

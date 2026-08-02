@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppContext } from '../../context/AppContext';
 
 const MOCK_STATS = [
   { label: 'Workouts this week', value: '4', change: '+1 from last week' },
@@ -6,13 +7,9 @@ const MOCK_STATS = [
   { label: 'Current Streak', value: '12 Days', change: 'Personal best: 14' },
 ];
 
-const MOCK_RECENT_WORKOUTS = [
-  { id: 1, name: 'Upper Body Power', duration: '45 min', date: 'Today' },
-  { id: 2, name: 'Leg Day Volume', duration: '60 min', date: 'Yesterday' },
-  { id: 3, name: 'Active Recovery (Yoga)', duration: '30 min', date: '2 days ago' },
-];
-
 export function Dashboard() {
+  const { workouts } = useAppContext();
+
   return (
     <div className="dashboard-layout">
       {/* Quick Stats Grid */}
@@ -45,13 +42,16 @@ export function Dashboard() {
         <div className="card recent-section">
           <h2 className="section-title">Recent Activity</h2>
           <div className="workout-list">
-            {MOCK_RECENT_WORKOUTS.map((workout) => (
+            {workouts.length === 0 && (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>No workouts logged yet.</p>
+            )}
+            {workouts.map((workout) => (
               <div key={workout.id} className="workout-item">
                 <div className="workout-info">
                   <div className="workout-name">{workout.name}</div>
                   <div className="workout-date">{workout.date}</div>
                 </div>
-                <div className="workout-duration">{workout.duration}</div>
+                <div className="workout-duration">{workout.duration} min</div>
               </div>
             ))}
           </div>
