@@ -454,3 +454,20 @@ textarea.form-control {
     max-width: 90%;
   }
 }
+
+/* Onboarding Specific Layout */
+.full-screen-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-page);
+  padding: 16px;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 32px;
+}
