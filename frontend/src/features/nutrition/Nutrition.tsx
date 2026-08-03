@@ -1,82 +1,94 @@
-
-const MOCK_MACROS = [
-  { label: 'Protein', current: 120, target: 160, unit: 'g', color: '#3b82f6' }, // Blue
-  { label: 'Carbs', current: 200, target: 250, unit: 'g', color: '#eab308' }, // Yellow
-  { label: 'Fats', current: 45, target: 60, unit: 'g', color: '#ef4444' }, // Red
-];
-
-const MOCK_MEALS = [
-  { id: 1, name: 'Oatmeal & Protein Shake', time: '8:00 AM', calories: 450, macros: '40p / 50c / 10f' },
-  { id: 2, name: 'Grilled Chicken Salad', time: '1:00 PM', calories: 350, macros: '45p / 15c / 12f' },
-  { id: 3, name: 'Greek Yogurt & Almonds', time: '4:30 PM', calories: 220, macros: '15p / 10c / 14f' },
-];
+import { CircularTracer, ProgressBar } from '../../components/ui/Progress';
 
 export function Nutrition() {
-  const totalCalories = MOCK_MEALS.reduce((acc, meal) => acc + meal.calories, 0);
-
   return (
     <div className="dashboard-layout">
-      {/* Top Stats Overview */}
-      <div className="stats-grid">
-        <div className="card stat-card">
-          <div className="stat-label">Total Calories</div>
-          <div className="stat-value">{totalCalories}</div>
-          <div className="stat-change" style={{ color: 'var(--text-secondary)' }}>Target: 2,200 kcal</div>
-        </div>
+      {/* Metrics Grid */}
+      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
         
-        {MOCK_MACROS.map((macro, i) => (
-          <div key={i} className="card stat-card">
-            <div className="stat-label">{macro.label}</div>
-            <div className="stat-value">{macro.current}{macro.unit}</div>
-            <div className="macro-progress-bar">
-              <div 
-                className="macro-fill" 
-                style={{ 
-                  width: `${(macro.current / macro.target) * 100}%`,
-                  backgroundColor: macro.color 
-                }}
-              ></div>
+        {/* Daily Energy Tracer */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h2 className="section-title" style={{ width: '100%', textAlign: 'left' }}>Energy Balance</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+            <CircularTracer value={1850} max={2400} label="kcal" color="var(--accent)" />
+          </div>
+          <div style={{ display: 'flex', gap: '24px', width: '100%', justifyContent: 'center', fontSize: '0.8125rem' }}>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Burned:</strong> 2,850</div>
+            <div><strong style={{ color: 'var(--text-secondary)' }}>Eaten:</strong> 1,850</div>
+          </div>
+        </div>
+
+        {/* Macros */}
+        <div className="card">
+          <h2 className="section-title">Macronutrients</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', alignItems: 'center', height: '100%' }}>
+            <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
+              <CircularTracer value={120} max={160} label="Pro" color="#3b82f6" />
             </div>
-            <div className="stat-change" style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>
-              {macro.target - macro.current}{macro.unit} remaining
+            <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
+              <CircularTracer value={200} max={250} label="Carb" color="#eab308" />
+            </div>
+            <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
+              <CircularTracer value={55} max={70} label="Fat" color="#ef4444" />
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Daily Targets */}
+        <div className="card">
+          <h2 className="section-title">Daily Targets</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+            <ProgressBar label="Steps" current={8500} target={10000} unit="" color="var(--accent)" />
+            <ProgressBar label="Water" current={2.1} target={3.0} unit="L" color="#06b6d4" />
+            <ProgressBar label="Sleep" current={6.5} target={8.0} unit="hrs" color="#8b5cf6" />
+            <ProgressBar label="Active Time" current={45} target={60} unit="min" color="#f97316" />
+          </div>
+        </div>
       </div>
 
       <div className="dashboard-columns">
-        {/* Log Meal Form Placeholder */}
         <div className="card">
           <h2 className="section-title">Log a Meal</h2>
           <form className="workout-form" onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
-              <label>Meal Description</label>
-              <input type="text" placeholder="e.g., 2 eggs and toast" className="form-control" />
+              <label>Food Item</label>
+              <input type="text" className="form-control" placeholder="e.g. Grilled Chicken Salad" />
             </div>
-            <div className="form-actions" style={{ borderTop: 'none', paddingTop: 0 }}>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                Analyze with AI
-              </button>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Calories (kcal)</label>
+                <input type="number" className="form-control" placeholder="350" />
+              </div>
+              <div className="form-group">
+                <label>Protein (g)</label>
+                <input type="number" className="form-control" placeholder="30" />
+              </div>
             </div>
+
+            <button type="button" className="btn btn-primary" style={{ marginTop: '16px', width: '100%' }}>
+              Add to Daily Log
+            </button>
           </form>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '12px', textAlign: 'center' }}>
-            Our AI will automatically estimate calories and macros based on your description.
-          </p>
         </div>
 
-        {/* Today's Meals List */}
         <div className="card">
-          <h2 className="section-title">Today's Log</h2>
+          <h2 className="section-title">Today's Meals</h2>
           <div className="workout-list">
-            {MOCK_MEALS.map((meal) => (
-              <div key={meal.id} className="workout-item">
-                <div className="workout-info">
-                  <div className="workout-name">{meal.name}</div>
-                  <div className="workout-date">{meal.time} • {meal.macros}</div>
-                </div>
-                <div className="workout-duration">{meal.calories} kcal</div>
+            <div className="workout-item">
+              <div className="workout-info">
+                <div className="workout-name">Oatmeal & Protein Shake</div>
+                <div className="workout-date">Breakfast</div>
               </div>
-            ))}
+              <div className="workout-duration">450 kcal</div>
+            </div>
+            <div className="workout-item">
+              <div className="workout-info">
+                <div className="workout-name">Chicken Breast & Rice</div>
+                <div className="workout-date">Lunch</div>
+              </div>
+              <div className="workout-duration">650 kcal</div>
+            </div>
           </div>
         </div>
       </div>
