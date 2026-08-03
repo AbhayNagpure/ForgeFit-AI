@@ -1,65 +1,57 @@
 import { useAppContext } from '../../context/AppContext';
 import { Settings } from '../settings/Settings';
 
-const MOCK_STATS = [
-  { label: 'Workouts this week', value: '4', change: '+1 from last week' },
-  { label: 'Active Calories', value: '2,450', change: '+12% from average' },
-  { label: 'Current Streak', value: '12 Days', change: 'Personal best: 14' },
-];
-
 export function Profile() {
-  const { workouts } = useAppContext();
+  const { userProfile } = useAppContext();
+  const mockStreak = 14;
 
   return (
     <div className="dashboard-layout">
-      {/* Quick Stats Grid */}
-      <div className="stats-grid">
-        {MOCK_STATS.map((stat, i) => (
-          <div key={i} className="card stat-card">
-            <div className="stat-label">{stat.label}</div>
-            <div className="stat-value">{stat.value}</div>
-            <div className="stat-change">{stat.change}</div>
+      {/* Top Banner: User Info */}
+      <div className="card profile-banner">
+        <div className="profile-banner-content">
+          <div className="profile-avatar-large">
+            {userProfile?.gender === 'female' ? '👩' : '👨'}
           </div>
-        ))}
-      </div>
-
-      <div className="dashboard-columns">
-        {/* Main Chart Area Placeholder */}
-        <div className="card chart-section">
-          <h2 className="section-title">Activity Overview</h2>
-          <div className="chart-placeholder">
-            <div className="bar" style={{ height: '40%' }}></div>
-            <div className="bar" style={{ height: '70%' }}></div>
-            <div className="bar" style={{ height: '30%' }}></div>
-            <div className="bar" style={{ height: '90%', backgroundColor: 'var(--accent)' }}></div>
-            <div className="bar" style={{ height: '50%' }}></div>
-            <div className="bar" style={{ height: '20%' }}></div>
-            <div className="bar" style={{ height: '60%' }}></div>
+          <div className="profile-details">
+            <h2 style={{ fontSize: '1.5rem', margin: '0 0 4px', fontWeight: 600 }}>Abhay Nagpure</h2>
+            <div className="profile-badges">
+              <span className="badge">Goal: {userProfile?.goal || 'Maintain'}</span>
+              <span className="badge">Age: {userProfile?.age || '--'}</span>
+              <span className="badge">Weight: {userProfile?.weight || '--'} kg</span>
+              <span className="badge">Height: {userProfile?.height || '--'} cm</span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Recent Workouts List */}
-        <div className="card recent-section">
-          <h2 className="section-title">Recent Activity</h2>
-          <div className="workout-list">
-            {workouts.length === 0 && (
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>No workouts logged yet.</p>
-            )}
-            {workouts.map((workout) => (
-              <div key={workout.id} className="workout-item">
-                <div className="workout-info">
-                  <div className="workout-name">{workout.name}</div>
-                  <div className="workout-date">{workout.date}</div>
-                </div>
-                <div className="workout-duration">{workout.duration} min</div>
-              </div>
+      <div className="dashboard-columns" style={{ gridTemplateColumns: '1fr' }}>
+        {/* Consistency Streak */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+          <h2 className="section-title">Consistency</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '8px 0 16px' }}>
+            <div style={{ fontSize: '2.5rem' }}>🔥</div>
+            <div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1 }}>{mockStreak}</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Day Streak</div>
+            </div>
+          </div>
+          
+          <div className="activity-grid" style={{ gridTemplateColumns: 'repeat(14, 1fr)' }}>
+            {Array.from({ length: 28 }).map((_, i) => (
+              <div 
+                key={i} 
+                className={`activity-dot ${i >= 28 - mockStreak ? 'active' : ''}`}
+                title={`Day ${i + 1}`}
+              />
             ))}
           </div>
+          <p className="page-subtitle" style={{ marginTop: '16px' }}>Top 5% of active users this week.</p>
         </div>
       </div>
 
       {/* Embedded Settings Section */}
-      <div style={{ marginTop: '24px' }}>
+      <div style={{ marginTop: '16px' }}>
         <Settings />
       </div>
     </div>
