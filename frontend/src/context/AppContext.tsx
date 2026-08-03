@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define the shape of our data
 export type Workout = {
@@ -9,9 +9,19 @@ export type Workout = {
   date: string;
 };
 
+export type UserProfile = {
+  age: number | '';
+  gender: string;
+  weight: number | '';
+  height: number | '';
+  goal: string;
+};
+
 type AppContextType = {
   workouts: Workout[];
   addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => void;
+  userProfile: UserProfile | null;
+  saveProfile: (profile: UserProfile) => void;
 };
 
 // Create the Context
@@ -35,8 +45,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setWorkouts([workout, ...workouts]);
   };
 
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const saveProfile = (profile: UserProfile) => {
+    setUserProfile(profile);
+  };
+
   return (
-    <AppContext.Provider value={{ workouts, addWorkout }}>
+    <AppContext.Provider value={{ workouts, addWorkout, userProfile, saveProfile }}>
       {children}
     </AppContext.Provider>
   );

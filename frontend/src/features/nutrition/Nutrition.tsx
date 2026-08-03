@@ -1,4 +1,3 @@
-import React from 'react';
 
 const MOCK_MACROS = [
   { label: 'Protein', current: 120, target: 160, unit: 'g', color: '#3b82f6' }, // Blue

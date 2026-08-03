@@ -1,5 +1,5 @@
-import React from 'react';
 import { useAppContext } from '../../context/AppContext';
+import { Settings } from '../settings/Settings';
 
 const MOCK_STATS = [
   { label: 'Workouts this week', value: '4', change: '+1 from last week' },
@@ -7,7 +7,7 @@ const MOCK_STATS = [
   { label: 'Current Streak', value: '12 Days', change: 'Personal best: 14' },
 ];
 
-export function Dashboard() {
+export function Profile() {
   const { workouts } = useAppContext();
 
   return (
@@ -56,6 +56,11 @@ export function Dashboard() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Embedded Settings Section */}
+      <div style={{ marginTop: '24px' }}>
+        <Settings />
       </div>
     </div>
   );

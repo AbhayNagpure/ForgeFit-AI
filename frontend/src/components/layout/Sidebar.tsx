@@ -1,4 +1,3 @@
-import React from 'react';
 
 type SidebarProps = {
   activeTab: string;
@@ -11,11 +10,11 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       <div className="brand">ForgeFit</div>
       <nav>
         <button 
-          className={`nav-link ${activeTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setActiveTab('dashboard')}
+          className={`nav-link ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
           style={{ width: '100%', textAlign: 'left' }}
         >
-          Dashboard
+          Profile
         </button>
         <button 
           className={`nav-link ${activeTab === 'workouts' ? 'active' : ''}`}
@@ -23,6 +22,13 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           style={{ width: '100%', textAlign: 'left' }}
         >
           Workouts
+        </button>
+        <button 
+          className={`nav-link ${activeTab === 'progress' ? 'active' : ''}`}
+          onClick={() => setActiveTab('progress')}
+          style={{ width: '100%', textAlign: 'left' }}
+        >
+          Progress
         </button>
         <button 
           className={`nav-link ${activeTab === 'nutrition' ? 'active' : ''}`}
@@ -37,13 +43,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           style={{ width: '100%', textAlign: 'left' }}
         >
           AI Coach
-        </button>
-        <button 
-          className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
-          style={{ width: '100%', textAlign: 'left' }}
-        >
-          Settings
         </button>
       </nav>
     </aside>
