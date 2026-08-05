@@ -3,7 +3,7 @@ import './index.css';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Profile } from './features/profile/Profile';
-import { AddWorkout } from './features/workouts/AddWorkout';
+import { Workouts } from './features/workouts/Workouts';
 import { ProgressTracking } from './features/progress/ProgressTracking';
 import { AICoach } from './features/ai-coach/AICoach';
 import { Nutrition } from './features/nutrition/Nutrition';
@@ -31,7 +31,7 @@ function App() {
 
         {/* Feature-Based Dynamic Content */}
         {activeTab === 'profile' && <Profile />}
-        {activeTab === 'workouts' && <AddWorkout />}
+        {activeTab === 'workouts' && <Workouts />}
         {activeTab === 'progress' && <ProgressTracking />}
         {activeTab === 'nutrition' && <Nutrition />}
         {activeTab === 'coach' && <AICoach />}
