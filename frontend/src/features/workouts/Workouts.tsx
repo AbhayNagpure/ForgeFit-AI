@@ -13,33 +13,36 @@ const EXERCISE_LIBRARY = [
   { group: 'Chest', subGroup: 'Middle Chest', name: 'Machine Chest Press', rating: 'Recommended', target: 'Beginner friendly', tips: ['Constant tension', 'Easy progressive overload'], videoPlaceholder: '/gifs/0009.gif' },
   { group: 'Chest', subGroup: 'Middle Chest', name: 'Cable Chest Fly', rating: 'Recommended', target: 'Chest isolation', tips: ['Keep slight elbow bend', 'Hugging motion', 'Squeeze chest at the end'], videoPlaceholder: '/animations/cable_lying_fly.mp4' },
   { group: 'Chest', subGroup: 'Middle Chest', name: 'Dumbbell Fly', rating: 'Optional', target: 'Deep stretch', tips: ['Don\'t go too heavy'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Chest', subGroup: 'Middle Chest', name: 'Push-ups', rating: 'Recommended', target: 'Excellent bodyweight movement', tips: ['Keep body straight', 'Chest touches floor'], videoPlaceholder: '/gifs/0001.gif' },
+  { group: 'Chest', subGroup: 'Middle Chest', name: 'Deep Push-Ups', rating: 'Recommended', target: 'Excellent bodyweight movement', tips: ['Keep body straight', 'Chest touches floor'], videoPlaceholder: '/animations/deep_push_ups.mp4' },
+  { group: 'Chest', subGroup: 'Middle Chest', name: 'Lever Pec Deck Fly', rating: 'Essential', target: 'Chest isolation', tips: ['Squeeze at the center'], videoPlaceholder: '/animations/lever_pec_deck_fly.mp4' },
 
   // Lower Chest
   { group: 'Chest', subGroup: 'Lower Chest', name: 'Decline Barbell Bench Press', rating: 'Recommended', target: 'Targets lower chest', tips: ['Decline bench about 15–30°'], videoPlaceholder: '/animations/barbell_decline_bench_press.mp4' },
-  { group: 'Chest', subGroup: 'Lower Chest', name: 'Decline Dumbbell Press', rating: 'Recommended', target: 'Better stretch than barbell', tips: ['Full range of motion'], videoPlaceholder: '/gifs/0009.gif' },
-  { group: 'Chest', subGroup: 'Lower Chest', name: 'Chest Dips', rating: 'Essential', target: 'Lower chest and triceps', tips: ['Lean torso forward', 'Elbows flare slightly', 'Descend until shoulders are comfortable'], videoPlaceholder: '/gifs/0009.gif' },
+  { group: 'Chest', subGroup: 'Lower Chest', name: 'Decline Dumbbell Press', rating: 'Recommended', target: 'Better stretch than barbell', tips: ['Full range of motion'], videoPlaceholder: '/animations/decline_dumbbell_bench_press.mp4' },
+  { group: 'Chest', subGroup: 'Lower Chest', name: 'Chest Dips', rating: 'Essential', target: 'Lower chest and triceps', tips: ['Lean torso forward', 'Elbows flare slightly', 'Descend until shoulders are comfortable'], videoPlaceholder: '/animations/chest_dips.mp4' },
   { group: 'Chest', subGroup: 'Lower Chest', name: 'High-to-Low Cable Fly', rating: 'Essential', target: 'Lower chest isolation', tips: ['Handles start above shoulders', 'Bring hands downward toward hips', 'Squeeze at the bottom'], videoPlaceholder: '/animations/high_fly.mp4' },
+  { group: 'Chest', subGroup: 'Lower Chest', name: 'Dumbbell Decline Fly', rating: 'Optional', target: 'Lower chest', tips: ['Decline bench 45 degrees'], videoPlaceholder: '/animations/dumbbell_decline_fly.mp4' },
 
   // 🪽 Lat (Back Width) Exercises
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Pull-Ups', rating: 'Essential', target: 'Best bodyweight exercise for lats', tips: ['Grip slightly wider than shoulders', 'Pull chest toward the bar'], videoPlaceholder: '/gifs/0001.gif' },
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Chin-Ups', rating: 'Recommended', target: 'More biceps involvement', tips: ['Underhand grip', 'Great for beginners'], videoPlaceholder: '/gifs/0001.gif' },
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Wide-Grip Lat Pulldown', rating: 'Essential', target: 'Lats', tips: ['Pull bar to upper chest', 'Don\'t lean back excessively', 'Focus on pulling with elbows'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Close-Grip Lat Pulldown', rating: 'Recommended', target: 'Strong lower lat activation', tips: ['Neutral or V-grip', 'Greater range of motion'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Straight-Arm Cable Pulldown', rating: 'Recommended', target: 'Excellent isolation for lats', tips: ['Arms nearly straight', 'Pull bar toward thighs'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Single-Arm Lat Pulldown', rating: 'Recommended', target: 'Better mind-muscle connection', tips: ['Helps fix muscle imbalances'], videoPlaceholder: '/gifs/0007.gif' },
+  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Chin-Ups & Pull-Ups', rating: 'Essential', target: 'Best bodyweight exercise for lats', tips: ['Grip slightly wider than shoulders', 'Pull chest toward the bar'], videoPlaceholder: '/animations/chin_ups_and_pull_ups.mp4' },
+  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Band Assisted Pull-Up', rating: 'Recommended', target: 'Lats', tips: ['Use a band for assistance'], videoPlaceholder: '/animations/band_assisted_pull_up.mp4' },
+  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Cable Pulldown', rating: 'Essential', target: 'Lats', tips: ['Pull bar to upper chest', 'Don\'t lean back excessively', 'Focus on pulling with elbows'], videoPlaceholder: '/animations/cable_pulldown.mp4' },
+  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Cable Close Grip Front Lat Pulldown', rating: 'Recommended', target: 'Strong lower lat activation', tips: ['Neutral or V-grip', 'Greater range of motion'], videoPlaceholder: '/animations/cable_close_grip_front_lat_pulldown.mp4' },
+  { group: 'Back', subGroup: '🪽 Lat (Back Width) Exercises', name: 'Band Kneeling One Arm Pulldown', rating: 'Recommended', target: 'Excellent isolation for lats', tips: ['Arms nearly straight'], videoPlaceholder: '/animations/band_kneeling_one_arm_pulldown.mp4' },
 
   // 🧱 Mid Back (Thickness) Exercises
-  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Barbell Bent-Over Row', rating: 'Essential', target: 'Back Thickness', tips: ['Keep back flat', 'Pull bar to lower chest/upper abdomen', 'Squeeze shoulder blades together'], videoPlaceholder: '/gifs/0007.gif' },
+  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Barbell Bent-Over Row (Overgrip)', rating: 'Essential', target: 'Back Thickness', tips: ['Keep back flat', 'Pull bar to lower chest/upper abdomen', 'Squeeze shoulder blades together'], videoPlaceholder: '/animations/barbell_bent_over_row.mp4' },
   { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Pendlay Row', rating: 'Recommended', target: 'Builds strength and thickness', tips: ['Bar starts from the floor each rep', 'Explosive pull'], videoPlaceholder: '/gifs/0002.gif' },
-  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Seated Cable Row', rating: 'Essential', target: 'Mid Back', tips: ['Pull handle to lower ribs', 'Keep chest up', 'Don\'t use momentum'], videoPlaceholder: '/gifs/0012.gif' },
-  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Chest-Supported Row', rating: 'Essential', target: 'Great for strict form', tips: ['Removes lower back involvement'], videoPlaceholder: '/gifs/0009.gif' },
+  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Band Seated Row', rating: 'Essential', target: 'Mid Back', tips: ['Pull handle to lower ribs', 'Keep chest up', 'Don\'t use momentum'], videoPlaceholder: '/animations/band_seated_row.mp4' },
+  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Band One Arm Twisting Seated Row', rating: 'Recommended', target: 'Mid Back isolation', tips: ['Twist at the end'], videoPlaceholder: '/animations/band_one_arm_twisting_seated_row.mp4' },
+  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Dumbbell Hammer Grip Incline Bench Row', rating: 'Essential', target: 'Great for strict form', tips: ['Removes lower back involvement'], videoPlaceholder: '/animations/dumbbell_hammer_grip_incline_bench_row.mp4' },
   { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'T-Bar Row', rating: 'Essential', target: 'Excellent for back thickness', tips: ['Pull toward chest'], videoPlaceholder: '/gifs/0001.gif' },
-  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'One-Arm Dumbbell Row', rating: 'Essential', target: 'Mid Back', tips: ['Stretch fully at the bottom', 'Pull elbow close to the body'], videoPlaceholder: '/gifs/0007.gif' },
+  { group: 'Back', subGroup: '🧱 Mid Back (Thickness) Exercises', name: 'Dumbbell Bent-Over Row', rating: 'Essential', target: 'Mid Back', tips: ['Stretch fully at the bottom', 'Pull elbow close to the body'], videoPlaceholder: '/animations/dumbbell_bent_over_row.mp4' },
 
   // ⛰️ Upper Back Exercises
   { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Face Pulls', rating: 'Essential', target: 'Great for traps and rear delts', tips: ['Pull rope toward face', 'Elbows high'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Rear Delt Fly', rating: 'Recommended', target: 'Rear Delts', tips: ['Slight bend in elbows', 'Lift outward, not backward'], videoPlaceholder: '/gifs/0006.gif' },
+  { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Lever Seated Reverse Fly', rating: 'Recommended', target: 'Rear Delts', tips: ['Slight bend in elbows', 'Lift outward, not backward'], videoPlaceholder: '/animations/lever_seated_reverse_fly.mp4' },
+  { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Cable Rear Delt Row (Rope)', rating: 'Recommended', target: 'Rear Delts', tips: ['Pull towards face'], videoPlaceholder: '/animations/cable_rear_delt_row.mp4' },
   { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Wide-Grip Seated Cable Row', rating: 'Recommended', target: 'Targets upper back more than lats', tips: ['Elbows flare outward'], videoPlaceholder: '/gifs/0012.gif' },
   { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'High Row Machine', rating: 'Recommended', target: 'Upper Back', tips: ['Pull toward upper chest', 'Strong contraction at the top'], videoPlaceholder: '/gifs/0010.gif' },
   { group: 'Back', subGroup: '⛰️ Upper Back Exercises', name: 'Shrugs', rating: 'Essential', target: 'Traps', tips: ['Lift shoulders straight up', 'Pause at the top', 'Don\'t roll shoulders'], videoPlaceholder: '/gifs/0013.gif' },
@@ -47,7 +50,7 @@ const EXERCISE_LIBRARY = [
   // 🔻 Lower Back Exercises
   { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: 'Deadlift', rating: 'Essential', target: 'Best overall posterior chain exercise', tips: ['Keep neutral spine', 'Drive through legs'], videoPlaceholder: '/gifs/0002.gif' },
   { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: 'Romanian Deadlift (RDL)', rating: 'Recommended', target: 'Focus on hamstrings and lower back', tips: ['Push hips back', 'Slight knee bend'], videoPlaceholder: '/gifs/0002.gif' },
-  { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: 'Back Extensions (Hyperextensions)', rating: 'Recommended', target: 'Lower Back', tips: ['Controlled movement', 'Avoid overextending at the top'], videoPlaceholder: '/gifs/0006.gif' },
+  { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: '45 Degree Hyperextension', rating: 'Recommended', target: 'Lower Back', tips: ['Controlled movement', 'Avoid overextending at the top'], videoPlaceholder: '/animations/45_degree_hyperextension.mp4' },
   { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: 'Good Mornings', rating: 'Optional', target: 'Lower Back, Hamstrings', tips: ['Light to moderate weight', 'Hinge at hips', 'Keep back straight'], videoPlaceholder: '/gifs/0011.gif' },
 
   // 🦵 Quadriceps Exercises
