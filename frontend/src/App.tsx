@@ -15,9 +15,9 @@ function App() {
   const { userProfile } = useAppContext();
 
   // If no profile exists, show the full-screen onboarding flow
-  if (!userProfile) {
-    return <Onboarding />;
-  }
+  // if (!userProfile) {
+  //   return <Onboarding />;
+  // }
 
   return (
     <div className="app-container">
