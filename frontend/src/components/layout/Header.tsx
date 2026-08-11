@@ -5,7 +5,7 @@ type HeaderProps = {
   setActiveTab: (tab: string) => void;
 };
 
-export function Header({ activeTab, setActiveTab }: HeaderProps) {
+export function Header({ activeTab }: HeaderProps) {
   return (
     <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
       <div>
