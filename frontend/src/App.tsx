@@ -7,17 +7,10 @@ import { Workouts } from './features/workouts/Workouts';
 import { ProgressTracking } from './features/progress/ProgressTracking';
 import { AICoach } from './features/ai-coach/AICoach';
 import { Nutrition } from './features/nutrition/Nutrition';
-import { Onboarding } from './features/onboarding/Onboarding';
-import { useAppContext } from './context/AppContext';
+import { Settings } from './features/settings/Settings';
 
 function App() {
   const [activeTab, setActiveTab] = useState('profile');
-  const { userProfile } = useAppContext();
-
-  // If no profile exists, show the full-screen onboarding flow
-  // if (!userProfile) {
-  //   return <Onboarding />;
-  // }
 
   return (
     <div className="app-container">
