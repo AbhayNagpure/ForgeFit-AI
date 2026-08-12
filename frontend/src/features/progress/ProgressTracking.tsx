@@ -2,11 +2,11 @@ import { useAppContext } from '../../context/AppContext';
 import { Flame, Scale, Dumbbell, Trophy, TrendingUp, Medal, Activity } from 'lucide-react';
 
 export function ProgressTracking() {
-  const { userProfile } = useAppContext();
+  const { userProfile, workouts } = useAppContext();
 
   // Mock data for the dashboard
   const currentStreak = 12;
-  const totalWorkouts = 143;
+  const totalWorkouts = workouts.length;
   const currentWeight = userProfile?.weight || 75;
   const weightChange = -2.5; // kg
   
