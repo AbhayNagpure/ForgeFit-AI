@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { EXERCISE_LIBRARY, MUSCLE_GROUPS } from './exerciseData';
-import { Star, Sparkles, Shield, ChevronRight } from 'lucide-react';
+import { Star, Sparkles, Shield, ChevronRight, Plus } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 
 export function Workouts() {
   const [selectedGroup, setSelectedGroup] = useState(MUSCLE_GROUPS[0]);
+  const { addWorkout } = useAppContext();
+  
   const filteredExercises = EXERCISE_LIBRARY.filter(ex => ex.group === selectedGroup);
 
   // Group the filtered exercises by their subGroup and limit 'Essential' to max 2 per group
@@ -27,13 +30,37 @@ export function Workouts() {
     return acc;
   }, {} as Record<string, { items: typeof EXERCISE_LIBRARY, essentialCount: number }>);
 
+  const handleQuickLog = () => {
+    const defaultWorkout = {
+      name: `${selectedGroup} Routine`,
+      type: 'strength',
+      duration: 45
+    };
+    addWorkout(defaultWorkout);
+    alert(`Logged ${selectedGroup} Routine to your Progress!`);
+  };
+
   return (
     <div className="dashboard-layout" style={{ gap: '32px' }}>
       {/* Header & Sticky Filter Pills */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '24px', zIndex: 10, padding: '24px', background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', borderRadius: '24px', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
-        <div>
-          <h2 className="page-title">Exercise Library</h2>
-          <p className="page-subtitle">Optimal form, target regions, and ratings.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h2 className="page-title">Exercise Library</h2>
+            <p className="page-subtitle">Optimal form, target regions, and ratings.</p>
+          </div>
+          <button 
+            onClick={handleQuickLog}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '10px 16px', background: 'var(--accent)', color: '#fff',
+              border: 'none', borderRadius: '12px', fontWeight: 600,
+              cursor: 'pointer', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
+            }}
+          >
+            <Plus size={18} />
+            Log {selectedGroup} Workout
+          </button>
         </div>
         
         {/* Horizontal Scrollable Pills */}

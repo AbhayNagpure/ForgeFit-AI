@@ -8,9 +8,25 @@ import { ProgressTracking } from './features/progress/ProgressTracking';
 import { AICoach } from './features/ai-coach/AICoach';
 import { Nutrition } from './features/nutrition/Nutrition';
 import { Settings } from './features/settings/Settings';
+import { Auth } from './features/auth/Auth';
+import { useAppContext } from './context/AppContext';
+import { Loader2 } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState('profile');
+  const { isAuthenticated, isLoadingAuth } = useAppContext();
+
+  if (isLoadingAuth) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-dark)' }}>
+        <Loader2 className="animate-spin" size={48} color="var(--accent)" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Auth />;
+  }
 
   return (
     <div className="app-container">

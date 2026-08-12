@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import aiRoutes from './routes/ai.routes';
+import authRoutes from './routes/auth.routes';
+import workoutRoutes from './routes/workout.routes';
 
 dotenv.config();
 
@@ -19,6 +21,8 @@ app.get('/', (req: Request, res: Response) => {
 
 // Register Feature Routes
 app.use('/api', aiRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/workouts', workoutRoutes);
 
 // Start Server
 app.listen(PORT, () => {
