@@ -1,8 +1,16 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE = 'http://localhost:5000/api';
 
-export const getAuthToken = () => localStorage.getItem('forgefit_token');
-export const setAuthToken = (token: string) => localStorage.setItem('forgefit_token', token);
-export const removeAuthToken = () => localStorage.removeItem('forgefit_token');
+export function setAuthToken(token: string) {
+  localStorage.setItem('forgefit_auth_token', token);
+}
+
+export function getAuthToken(): string | null {
+  return localStorage.getItem('forgefit_auth_token');
+}
+
+export function removeAuthToken() {
+  localStorage.removeItem('forgefit_auth_token');
+}
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = getAuthToken();
@@ -16,15 +24,16 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers,
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `API Error: ${response.status}`);
+    throw new Error(data.error || 'Something went wrong');
   }
 
-  return response.json();
+  return data;
 }

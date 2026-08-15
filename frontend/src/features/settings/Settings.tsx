@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { User, Bell, Palette, Scale, AlertTriangle } from 'lucide-react';
+import { User, Bell, Palette, Scale, AlertTriangle, LogOut } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 
 export function Settings() {
   const [theme, setTheme] = useState('dark');
   const [notifications, setNotifications] = useState(true);
+  const { logout } = useAppContext();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
@@ -103,20 +105,42 @@ export function Settings() {
         </button>
       </div>
 
-      {/* Danger Zone */}
-      <div className="card" style={{ marginTop: '32px', border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.02)' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <AlertTriangle size={20} /> Danger Zone
-        </h2>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
-          Once you delete your account, there is no going back. All your workout logs, PRs, and AI insights will be permanently erased. Please be certain.
-        </p>
-        <button style={{ 
-          background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)',
-          padding: '12px 24px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', width: '100%'
-        }}>
-          Delete Account Permanently
-        </button>
+      {/* Logout & Danger Zone */}
+      <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>Sign Out</h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>Log out of your account on this device.</p>
+          </div>
+          <button 
+            onClick={logout}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '10px 20px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-glass)', 
+              color: 'var(--text-primary)', cursor: 'pointer', borderRadius: '12px', fontWeight: 600, transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
+        </div>
+
+        <div className="card" style={{ border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.02)' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertTriangle size={20} /> Danger Zone
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
+            Once you delete your account, there is no going back. All your workout logs, PRs, and AI insights will be permanently erased. Please be certain.
+          </p>
+          <button style={{ 
+            background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)',
+            padding: '12px 24px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', width: '100%'
+          }}>
+            Delete Account Permanently
+          </button>
+        </div>
       </div>
     </div>
   );

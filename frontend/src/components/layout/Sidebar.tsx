@@ -20,7 +20,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   return (
     <aside className="sidebar" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       <div>
-        <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2rem' }}>
           <Activity size={24} color="var(--accent)" />
           ForgeFit
         </div>
@@ -38,21 +38,17 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           ))}
         </nav>
       </div>
-
-      <button 
-        onClick={logout}
-        style={{ 
-          width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px',
-          padding: '12px 16px', background: 'none', border: 'none', 
-          color: 'var(--text-secondary)', cursor: 'pointer',
-          borderRadius: '12px', transition: 'all 0.2s'
-        }}
-        onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
-        onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'none'; }}
-      >
-        <LogOut size={18} />
-        Sign Out
-      </button>
+      
+      <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+        <button 
+          className="nav-link"
+          onClick={logout}
+          style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}
+        >
+          <LogOut size={18} strokeWidth={2} />
+          Sign Out
+        </button>
+      </div>
     </aside>
   );
 }

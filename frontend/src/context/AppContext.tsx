@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { apiRequest, setAuthToken, removeAuthToken, getAuthToken } from '../api';
 
@@ -11,7 +11,7 @@ export type Workout = {
 };
 
 export type UserProfile = {
-  id?: string;
+  id?: string | number;
   name?: string;
   email?: string;
   age: number | '';
@@ -23,71 +23,61 @@ export type UserProfile = {
 
 type AppContextType = {
   workouts: Workout[];
-  addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => void;
+  addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => Promise<void>;
   userProfile: UserProfile | null;
   saveProfile: (profile: UserProfile) => void;
   isAuthenticated: boolean;
-  login: (token: string, user: any) => void;
-  logout: () => void;
   isLoadingAuth: boolean;
+  login: (token: string) => void;
+  logout: () => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  useEffect(() => {
-    // Check if user is logged in on mount
-    const checkAuth = async () => {
-      const token = getAuthToken();
-      if (token) {
-        try {
-          const data = await apiRequest('/auth/me');
-          if (data.user) {
-            setIsAuthenticated(true);
-            setUserProfile((prev) => ({
-              ...(prev || { age: '', gender: '', weight: '', height: '', goal: '' }),
-              id: data.user.id,
-              name: data.user.name,
-              email: data.user.email,
-              goal: data.user.goal || 'Build Muscle'
-            }));
-            
-            // Fetch workouts
-            const workoutsData = await apiRequest('/workouts');
-            setWorkouts(workoutsData);
-          }
-        } catch (err) {
-          console.error("Auth check failed:", err);
-          removeAuthToken();
-        }
-      }
+  const fetchWorkouts = async () => {
+    try {
+      const data = await apiRequest('/workouts');
+      setWorkouts(data.workouts || []);
+    } catch (err) {
+      console.error('Failed to fetch workouts:', err);
+    }
+  };
+
+  const verifyAuth = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) {
       setIsLoadingAuth(false);
-    };
-    checkAuth();
+      setIsAuthenticated(false);
+      return;
+    }
+
+    try {
+      const data = await apiRequest('/auth/me');
+      setUserProfile(data.user);
+      setIsAuthenticated(true);
+      fetchWorkouts();
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      removeAuthToken();
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoadingAuth(false);
+    }
   }, []);
 
-  const login = async (token: string, user: any) => {
+  useEffect(() => {
+    verifyAuth();
+  }, [verifyAuth]);
+
+  const login = (token: string) => {
     setAuthToken(token);
-    setIsAuthenticated(true);
-    setUserProfile((prev) => ({
-      ...(prev || { age: '', gender: '', weight: '', height: '', goal: '' }),
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    }));
-    
-    try {
-      const workoutsData = await apiRequest('/workouts');
-      setWorkouts(workoutsData);
-    } catch (err) {
-      console.error("Failed to load workouts:", err);
-    }
+    verifyAuth();
   };
 
   const logout = () => {
@@ -99,13 +89,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addWorkout = async (newWorkout: Omit<Workout, 'id' | 'date'>) => {
     try {
-      const savedWorkout = await apiRequest('/workouts', {
+      const data = await apiRequest('/workouts', {
         method: 'POST',
         body: JSON.stringify(newWorkout)
       });
-      setWorkouts([savedWorkout, ...workouts]);
+      setWorkouts([data.workout, ...workouts]);
     } catch (err) {
-      console.error("Failed to save workout:", err);
+      console.error('Failed to add workout:', err);
     }
   };
 
@@ -114,7 +104,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ workouts, addWorkout, userProfile, saveProfile, isAuthenticated, login, logout, isLoadingAuth }}>
+    <AppContext.Provider value={{
+      workouts,
+      addWorkout,
+      userProfile,
+      saveProfile,
+      isAuthenticated,
+      isLoadingAuth,
+      login,
+      logout
+    }}>
       {children}
     </AppContext.Provider>
   );

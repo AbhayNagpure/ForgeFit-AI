@@ -18,8 +18,8 @@ function App() {
 
   if (isLoadingAuth) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-dark)' }}>
-        <Loader2 className="animate-spin" size={48} color="var(--accent)" />
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
+        <Loader2 className="animate-spin" color="#38bdf8" size={48} />
       </div>
     );
   }

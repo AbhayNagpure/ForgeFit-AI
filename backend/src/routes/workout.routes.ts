@@ -1,13 +1,10 @@
 import { Router } from 'express';
-import { WorkoutController } from '../controllers/workout.controller';
+import { createWorkout, getWorkouts } from '../controllers/workout.controller';
 import { requireAuth } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Route: GET /api/workouts
-router.get('/', requireAuth, WorkoutController.getWorkouts);
-
-// Route: POST /api/workouts
-router.post('/', requireAuth, WorkoutController.createWorkout);
+router.post('/', requireAuth, createWorkout);
+router.get('/', requireAuth, getWorkouts);
 
 export default router;
