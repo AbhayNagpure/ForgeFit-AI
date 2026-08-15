@@ -1,4 +1,5 @@
-import { Activity, Dumbbell, LineChart, Apple, User, BrainCircuit } from 'lucide-react';
+import { Activity, Dumbbell, LineChart, Apple, User, BrainCircuit, LogOut } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 
 type SidebarProps = {
   activeTab: string;
@@ -6,6 +7,8 @@ type SidebarProps = {
 };
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const { logout } = useAppContext();
+  
   const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'workouts', label: 'Workouts', icon: Dumbbell },
@@ -15,24 +18,37 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <Activity size={24} color="var(--accent)" />
-        ForgeFit
+    <aside className="sidebar" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div>
+        <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2rem' }}>
+          <Activity size={24} color="var(--accent)" />
+          ForgeFit
+        </div>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {navItems.map(({ id, label, icon: Icon }) => (
+            <button 
+              key={id}
+              className={`nav-link ${activeTab === id ? 'active' : ''}`}
+              onClick={() => setActiveTab(id)}
+              style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}
+            >
+              <Icon size={18} strokeWidth={activeTab === id ? 2.5 : 2} opacity={activeTab === id ? 1 : 0.7} />
+              {label}
+            </button>
+          ))}
+        </nav>
       </div>
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        {navItems.map(({ id, label, icon: Icon }) => (
-          <button 
-            key={id}
-            className={`nav-link ${activeTab === id ? 'active' : ''}`}
-            onClick={() => setActiveTab(id)}
-            style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}
-          >
-            <Icon size={18} strokeWidth={activeTab === id ? 2.5 : 2} opacity={activeTab === id ? 1 : 0.7} />
-            {label}
-          </button>
-        ))}
-      </nav>
+      
+      <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+        <button 
+          className="nav-link"
+          onClick={logout}
+          style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444' }}
+        >
+          <LogOut size={18} strokeWidth={2} />
+          Sign Out
+        </button>
+      </div>
     </aside>
   );
 }

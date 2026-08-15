@@ -1,7 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import { apiRequest, setAuthToken, removeAuthToken, getAuthToken } from '../api';
 
-// Define the shape of our data
 export type Workout = {
   id: number;
   name: string;
@@ -11,6 +11,9 @@ export type Workout = {
 };
 
 export type UserProfile = {
+  id?: string | number;
+  name?: string;
+  email?: string;
   age: number | '';
   gender: string;
   weight: number | '';
@@ -20,46 +23,102 @@ export type UserProfile = {
 
 type AppContextType = {
   workouts: Workout[];
-  addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => void;
+  addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => Promise<void>;
   userProfile: UserProfile | null;
   saveProfile: (profile: UserProfile) => void;
+  isAuthenticated: boolean;
+  isLoadingAuth: boolean;
+  login: (token: string) => void;
+  logout: () => void;
 };
 
-// Create the Context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Provide the Context
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Start with some default mock data
-  const [workouts, setWorkouts] = useState<Workout[]>([
-    { id: 1, name: 'Upper Body Power', type: 'strength', duration: 45, date: 'Today' },
-    { id: 2, name: 'Active Recovery (Yoga)', type: 'flexibility', duration: 30, date: 'Yesterday' }
-  ]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  const addWorkout = (newWorkout: Omit<Workout, 'id' | 'date'>) => {
-    const workout: Workout = {
-      ...newWorkout,
-      id: Date.now(), // Generate a fake ID
-      date: 'Just now'
-    };
-    // Add the new workout to the top of the list
-    setWorkouts([workout, ...workouts]);
+  const fetchWorkouts = async () => {
+    try {
+      const data = await apiRequest('/workouts');
+      setWorkouts(data.workouts || []);
+    } catch (err) {
+      console.error('Failed to fetch workouts:', err);
+    }
   };
 
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const verifyAuth = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+      return;
+    }
+
+    try {
+      const data = await apiRequest('/auth/me');
+      setUserProfile(data.user);
+      setIsAuthenticated(true);
+      fetchWorkouts();
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      removeAuthToken();
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoadingAuth(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    verifyAuth();
+  }, [verifyAuth]);
+
+  const login = (token: string) => {
+    setAuthToken(token);
+    verifyAuth();
+  };
+
+  const logout = () => {
+    removeAuthToken();
+    setIsAuthenticated(false);
+    setUserProfile(null);
+    setWorkouts([]);
+  };
+
+  const addWorkout = async (newWorkout: Omit<Workout, 'id' | 'date'>) => {
+    try {
+      const data = await apiRequest('/workouts', {
+        method: 'POST',
+        body: JSON.stringify(newWorkout)
+      });
+      setWorkouts([data.workout, ...workouts]);
+    } catch (err) {
+      console.error('Failed to add workout:', err);
+    }
+  };
 
   const saveProfile = (profile: UserProfile) => {
     setUserProfile(profile);
   };
 
   return (
-    <AppContext.Provider value={{ workouts, addWorkout, userProfile, saveProfile }}>
+    <AppContext.Provider value={{
+      workouts,
+      addWorkout,
+      userProfile,
+      saveProfile,
+      isAuthenticated,
+      isLoadingAuth,
+      login,
+      logout
+    }}>
       {children}
     </AppContext.Provider>
   );
 }
 
-// Custom hook to easily use the Context
 export function useAppContext() {
   const context = useContext(AppContext);
   if (context === undefined) {
