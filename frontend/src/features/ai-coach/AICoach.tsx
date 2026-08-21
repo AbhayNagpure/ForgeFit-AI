@@ -5,12 +5,16 @@ type Message = {
   text: string;
 };
 
+import { apiRequest } from '../../api';
+import { useAppContext } from '../../context/AppContext';
+
 export function AICoach() {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     { role: 'ai', text: 'Hey there! I am ForgeFit AI, your personal data-driven coach. What are we working on today?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const { fetchWorkouts } = useAppContext();
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +27,21 @@ export function AICoach() {
 
     try {
       // Send message to our backend endpoint
-      const response = await fetch('http://localhost:5000/api/chat', {
+      // Exclude the first welcome message from history to save tokens
+      const history = messages.slice(1);
+      
+      const data = await apiRequest('/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ message: userMessage, history })
       });
 
-      const data = await response.json();
+      if (data.actionsTaken && data.actionsTaken.length > 0) {
+        data.actionsTaken.forEach((action: any) => {
+           if (action.type === 'WORKOUT_ADDED') {
+              fetchWorkouts(); // Refresh the workout list in the background
+           }
+        });
+      }
       
       if (data.reply) {
         setMessages(prev => [...prev, { role: 'ai', text: data.reply }]);

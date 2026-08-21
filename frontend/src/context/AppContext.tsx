@@ -30,6 +30,7 @@ type AppContextType = {
   isLoadingAuth: boolean;
   login: (token: string) => void;
   logout: () => void;
+  fetchWorkouts: () => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -112,7 +113,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       isAuthenticated,
       isLoadingAuth,
       login,
-      logout
+      logout,
+      fetchWorkouts
     }}>
       {children}
     </AppContext.Provider>

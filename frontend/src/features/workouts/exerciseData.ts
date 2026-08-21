@@ -38,6 +38,7 @@ export const EXERCISE_LIBRARY = [
   { group: 'Back', subGroup: '🔻 Lower Back Exercises', name: '45 Degree Hyperextension', rating: 'Recommended', target: 'Lower Back', tips: ['Controlled movement', 'Avoid overextending at the top'], videoPlaceholder: '/animations/45_degree_hyperextension.mp4' },
 
   
+  
   // 🦵 Quadriceps Exercises
   { group: 'Legs', subGroup: '🦵 Quadriceps Exercises', name: 'Classic Barbell Squat', rating: 'Essential', target: 'The Ultimate Exercise for Strength & Muscle Growth', tips: ['Keep chest up', 'Drive through heels'], videoPlaceholder: '/animations/classic_barbell_squat.mp4' },
   { group: 'Legs', subGroup: '🦵 Quadriceps Exercises', name: 'Barbell Lunge', rating: 'Recommended', target: 'Build Leg Strength, Balance & Athletic Power', tips: ['Keep torso upright', 'Don\'t let knee pass toes'], videoPlaceholder: '/animations/barbell_lunge.mp4' },
@@ -125,35 +126,14 @@ export const EXERCISE_LIBRARY = [
   { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Close Grip Push-Ups', rating: 'Recommended', target: 'Medial Head, Chest', tips: ['Hands close together', 'Keep elbows close', 'Lower chest between hands'], videoPlaceholder: '/animations/close_grip_push_ups.mp4' },
   { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Dumbbell One Arm Triceps Extension', rating: 'Recommended', target: 'Medial Head', tips: ['Focus on full extension', 'Great for correcting imbalances'], videoPlaceholder: '/animations/dumbbell_one_arm_triceps_extension.mp4' },
 
-  // ⬜ Upper Abs Exercises
-  { group: 'Abs', subGroup: '⬜ Upper Abs Exercises', name: 'Cable Crunch', rating: 'Essential', target: 'Upper Abs', tips: ['Kneel in front of a cable', 'Curl your spine downward', 'Don\'t pull with your arms'], videoPlaceholder: '/gifs/0006.gif' },
-  { group: 'Abs', subGroup: '⬜ Upper Abs Exercises', name: 'Machine Crunch', rating: 'Essential', target: 'Upper Abs', tips: ['Keep lower back against the pad', 'Exhale as you crunch', 'Slow, controlled reps'], videoPlaceholder: '/gifs/0009.gif' },
-  { group: 'Abs', subGroup: '⬜ Upper Abs Exercises', name: 'Stability Ball Crunch', rating: 'Recommended', target: 'Upper Abs', tips: ['Lie on a stability ball', 'Crunch while keeping hips stable', 'Full range of motion'], videoPlaceholder: '/gifs/0009.gif' },
-  { group: 'Abs', subGroup: '⬜ Upper Abs Exercises', name: 'Weighted Crunch', rating: 'Recommended', target: 'Upper Abs', tips: ['Hold a plate on your chest', 'Curl your upper body', 'Don\'t pull your neck'], videoPlaceholder: '/gifs/0009.gif' },
+  // ⬜ Abs Exercises
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Weighted Leg Extension Crunch', rating: 'Essential', target: 'Build Stronger Abs', tips: ['Use a weight plate', 'Crunch and extend legs'], videoPlaceholder: '/animations/weighted_leg_extension_crunch.mp4' },
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Vertical Leg Raise', rating: 'Essential', target: 'Strengthen Lower Abs', tips: ['Hang vertically', 'Raise legs without swinging'], videoPlaceholder: '/animations/vertical_leg_raise.mp4' },
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Lying Floor Leg Raise', rating: 'Recommended', target: 'Tone Your Lower Abs', tips: ['Lie flat on floor', 'Keep lower back pressed down'], videoPlaceholder: '/animations/lying_floor_leg_raise.mp4' },
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Lever Seated Leg Raise Crunch', rating: 'Recommended', target: 'Strengthen Lower Abs', tips: ['Use lever machine', 'Crunch while raising legs'], videoPlaceholder: '/animations/lever_seated_leg_raise_crunch.mp4' },
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Lever Seated Crunch', rating: 'Recommended', target: 'Build Strong Abs', tips: ['Use lever machine', 'Controlled crunch'], videoPlaceholder: '/animations/lever_seated_crunch.mp4' },
+  { group: 'Abs', subGroup: '⬜ Abs Exercises', name: 'Incline Leg Hip Raise', rating: 'Recommended', target: 'Tone Lower Abs', tips: ['Use incline bench', 'Raise hips at top of movement'], videoPlaceholder: '/animations/incline_leg_hip_raise.mp4' },
 
-  // 🔲 Lower Abs Exercises
-  { group: 'Abs', subGroup: '🔲 Lower Abs Exercises', name: 'Hanging Leg Raise', rating: 'Essential', target: 'Lower Abs', tips: ['Hang from a pull-up bar', 'Raise legs without swinging', 'Tilt pelvis upward at the top'], videoPlaceholder: '/gifs/0011.gif' },
-  { group: 'Abs', subGroup: '🔲 Lower Abs Exercises', name: 'Hanging Knee Raise', rating: 'Essential', target: 'Lower Abs', tips: ['Bend knees if full leg raises are difficult', 'Focus on curling the hips upward'], videoPlaceholder: '/gifs/0011.gif' },
-  { group: 'Abs', subGroup: '🔲 Lower Abs Exercises', name: 'Reverse Crunch', rating: 'Essential', target: 'Lower Abs', tips: ['Lie on your back', 'Bring knees toward your chest', 'Lift hips off the floor'], videoPlaceholder: '/gifs/0006.gif' },
-  { group: 'Abs', subGroup: '🔲 Lower Abs Exercises', name: 'Lying Leg Raise', rating: 'Recommended', target: 'Lower Abs', tips: ['Keep lower back pressed into the floor', 'Lower legs slowly', 'Avoid arching your back'], videoPlaceholder: '/gifs/0013.gif' },
-
-  // 🔄 Oblique Exercises
-  { group: 'Abs', subGroup: '🔄 Oblique Exercises', name: 'Cable Wood Chop', rating: 'Essential', target: 'Obliques', tips: ['Rotate your torso', 'Keep hips stable', 'Control both directions'], videoPlaceholder: '/gifs/0009.gif' },
-  { group: 'Abs', subGroup: '🔄 Oblique Exercises', name: 'Russian Twist', rating: 'Recommended', target: 'Obliques', tips: ['Lean back slightly', 'Rotate through the torso', 'Add weight as you progress'], videoPlaceholder: '/gifs/0011.gif' },
-  { group: 'Abs', subGroup: '🔄 Oblique Exercises', name: 'Side Plank', rating: 'Essential', target: 'Obliques', tips: ['Keep body in a straight line', 'Hold the position', 'Don\'t let hips sag'], videoPlaceholder: '/gifs/0002.gif' },
-  { group: 'Abs', subGroup: '🔄 Oblique Exercises', name: 'Bicycle Crunch', rating: 'Recommended', target: 'Obliques', tips: ['Bring opposite elbow to opposite knee', 'Slow and controlled movement'], videoPlaceholder: '/gifs/0003.gif' },
-
-  // 🛡️ Transverse Abdominis (Deep Core)
-  { group: 'Abs', subGroup: '🛡️ Transverse Abdominis (Deep Core)', name: 'Plank', rating: 'Essential', target: 'Deep Core', tips: ['Elbows under shoulders', 'Body in a straight line', 'Brace your core'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Abs', subGroup: '🛡️ Transverse Abdominis (Deep Core)', name: 'Dead Bug', rating: 'Essential', target: 'Deep Core', tips: ['Lower opposite arm and leg', 'Keep lower back on the floor', 'Move slowly'], videoPlaceholder: '/gifs/0002.gif' },
-  { group: 'Abs', subGroup: '🛡️ Transverse Abdominis (Deep Core)', name: 'Hollow Body Hold', rating: 'Essential', target: 'Deep Core', tips: ['Press lower back into the floor', 'Lift shoulders and legs slightly', 'Maintain tension'], videoPlaceholder: '/gifs/0007.gif' },
-  { group: 'Abs', subGroup: '🛡️ Transverse Abdominis (Deep Core)', name: 'Ab Wheel Rollout', rating: 'Essential', target: 'Deep Core', tips: ['Roll forward slowly', 'Don\'t let hips sag', 'Pull back using your core'], videoPlaceholder: '/gifs/0006.gif' },
-
-  // 🧱 Lower Back Exercises
-  { group: 'Abs', subGroup: '🧱 Lower Back Exercises', name: 'Back Extension', rating: 'Essential', target: 'Lower Back', tips: ['Controlled movement', 'Stop at neutral spine', 'Don\'t overextend'], videoPlaceholder: '/gifs/0002.gif' },
-  { group: 'Abs', subGroup: '🧱 Lower Back Exercises', name: 'Superman', rating: 'Recommended', target: 'Lower Back', tips: ['Lift arms and legs together', 'Hold briefly', 'Lower slowly'], videoPlaceholder: '/gifs/0001.gif' },
-  { group: 'Abs', subGroup: '🧱 Lower Back Exercises', name: 'Bird Dog', rating: 'Essential', target: 'Lower Back', tips: ['Extend opposite arm and leg', 'Keep hips level', 'Focus on stability'], videoPlaceholder: '/gifs/0003.gif' },
-  { group: 'Abs', subGroup: '🧱 Lower Back Exercises', name: 'Good Morning', rating: 'Recommended', target: 'Lower Back', tips: ['Hip hinge movement', 'Keep back straight', 'Use light to moderate weight'], videoPlaceholder: '/gifs/0011.gif' }
 ];
 
 export const MUSCLE_GROUPS = ['Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 'Triceps', 'Abs'];
