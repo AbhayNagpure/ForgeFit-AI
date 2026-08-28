@@ -1,10 +1,10 @@
 import express from 'express';
 import { addBodyMetric, getBodyMetrics } from '../controllers/bodyMetric.controller';
-import { protect } from '../middleware/auth.middleware';
+import { requireAuth } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/', protect, addBodyMetric);
-router.get('/', protect, getBodyMetrics);
+router.post('/', requireAuth, addBodyMetric);
+router.get('/', requireAuth, getBodyMetrics);
 
 export default router;

@@ -3,10 +3,28 @@ import type { ReactNode } from 'react';
 import { apiRequest, setAuthToken, removeAuthToken, getAuthToken } from '../api';
 
 export type Workout = {
-  id: number;
+  id: string;
   name: string;
   type: string;
   duration: number;
+  date: string;
+};
+
+export type PersonalRecord = {
+  id: string;
+  exerciseName: string;
+  weight: number;
+  reps?: number;
+  date: string;
+};
+
+export type BodyMetric = {
+  id: string;
+  bodyFat?: number;
+  chest?: number;
+  arms?: number;
+  waist?: number;
+  thighs?: number;
   date: string;
 };
 
@@ -23,6 +41,8 @@ export type UserProfile = {
 
 type AppContextType = {
   workouts: Workout[];
+  personalRecords: PersonalRecord[];
+  bodyMetrics: BodyMetric[];
   addWorkout: (workout: Omit<Workout, 'id' | 'date'>) => Promise<void>;
   userProfile: UserProfile | null;
   saveProfile: (profile: UserProfile) => void;
@@ -31,12 +51,17 @@ type AppContextType = {
   login: (token: string) => void;
   logout: () => void;
   fetchWorkouts: () => Promise<void>;
+  fetchPersonalRecords: () => Promise<void>;
+  fetchBodyMetrics: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
+  const [bodyMetrics, setBodyMetrics] = useState<BodyMetric[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
@@ -47,6 +72,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setWorkouts(data.workouts || []);
     } catch (err) {
       console.error('Failed to fetch workouts:', err);
+    }
+  };
+
+  const fetchPersonalRecords = async () => {
+    try {
+      const data = await apiRequest('/personal-records');
+      setPersonalRecords(data || []);
+    } catch (err) {
+      console.error('Failed to fetch PRs:', err);
+    }
+  };
+
+  const fetchBodyMetrics = async () => {
+    try {
+      const data = await apiRequest('/body-metrics');
+      setBodyMetrics(data || []);
+    } catch (err) {
+      console.error('Failed to fetch metrics:', err);
     }
   };
 
@@ -63,6 +106,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUserProfile(data.user);
       setIsAuthenticated(true);
       fetchWorkouts();
+      fetchPersonalRecords();
+      fetchBodyMetrics();
     } catch (err) {
       console.error('Auth check failed:', err);
       removeAuthToken();
@@ -86,6 +131,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
     setUserProfile(null);
     setWorkouts([]);
+    setPersonalRecords([]);
+    setBodyMetrics([]);
   };
 
   const addWorkout = async (newWorkout: Omit<Workout, 'id' | 'date'>) => {
@@ -107,6 +154,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       workouts,
+      personalRecords,
+      bodyMetrics,
       addWorkout,
       userProfile,
       saveProfile,
@@ -114,7 +163,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       isLoadingAuth,
       login,
       logout,
-      fetchWorkouts
+      fetchWorkouts,
+      fetchPersonalRecords,
+      fetchBodyMetrics,
+      refreshProfile: verifyAuth
     }}>
       {children}
     </AppContext.Provider>

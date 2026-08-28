@@ -83,7 +83,16 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
       res.status(404).json({ error: 'User not found' });
       return;
     }
-    res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, goal: user.goal } });
+    res.status(200).json({ user: { 
+      id: user.id, 
+      email: user.email, 
+      name: user.name, 
+      goal: user.goal,
+      weight: user.weight,
+      height: user.height,
+      age: user.age,
+      gender: user.gender
+    } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
