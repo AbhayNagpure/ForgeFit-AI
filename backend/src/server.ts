@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import aiRoutes from './routes/ai.routes';
 import authRoutes from './routes/auth.routes';
 import workoutRoutes from './routes/workout.routes';
+import personalRecordRoutes from './routes/personalRecord.routes';
+import bodyMetricRoutes from './routes/bodyMetric.routes';
 
 dotenv.config();
 
@@ -23,6 +25,8 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api', aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/workouts', workoutRoutes);
+app.use('/api/personal-records', personalRecordRoutes);
+app.use('/api/body-metrics', bodyMetricRoutes);
 
 // Start Server
 app.listen(PORT, () => {

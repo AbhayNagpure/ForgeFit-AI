@@ -16,8 +16,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  workouts   Workout[]
-  weightLogs WeightLog[]
+  workouts        Workout[]
+  weightLogs      WeightLog[]
+  personalRecords PersonalRecord[]
+  bodyMetrics     BodyMetric[]
 }
 
 model Workout {
@@ -28,6 +30,8 @@ model Workout {
   type      String
   duration  Int
   date      DateTime @default(now())
+  
+  exercises WorkoutExercise[]
 }
 
 model WeightLog {
@@ -35,5 +39,37 @@ model WeightLog {
   userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   weight    Float
+  date      DateTime @default(now())
+}
+
+model WorkoutExercise {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  workoutId String   @db.ObjectId
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  name      String
+  sets      Int
+  reps      Int
+  weight    Float?   
+}
+
+model PersonalRecord {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exerciseName String
+  weight       Float
+  reps         Int?
+  date         DateTime @default(now())
+}
+
+model BodyMetric {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bodyFat   Float?
+  chest     Float?
+  arms      Float?
+  waist     Float?
+  thighs    Float?
   date      DateTime @default(now())
 }
