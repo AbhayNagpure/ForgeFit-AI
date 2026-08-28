@@ -1,11 +1,11 @@
 import express from 'express';
 import { addPersonalRecord, getPersonalRecords, deletePersonalRecord } from '../controllers/personalRecord.controller';
-import { protect } from '../middleware/auth.middleware';
+import { requireAuth } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/', protect, addPersonalRecord);
-router.get('/', protect, getPersonalRecords);
-router.delete('/:id', protect, deletePersonalRecord);
+router.post('/', requireAuth, addPersonalRecord);
+router.get('/', requireAuth, getPersonalRecords);
+router.delete('/:id', requireAuth, deletePersonalRecord);
 
 export default router;

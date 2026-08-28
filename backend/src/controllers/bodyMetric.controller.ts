@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const addBodyMetric = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
     const { bodyFat, chest, arms, waist, thighs } = req.body;
 
     const metric = await prisma.bodyMetric.create({
@@ -28,7 +28,7 @@ export const addBodyMetric = async (req: Request, res: Response): Promise<void> 
 
 export const getBodyMetrics = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user.userId;
 
     const metrics = await prisma.bodyMetric.findMany({
       where: { userId },
