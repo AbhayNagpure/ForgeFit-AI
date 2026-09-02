@@ -37,6 +37,12 @@ export type UserProfile = {
   weight: number | '';
   height: number | '';
   goal: string;
+  dailyCalories?: number;
+  dailyProtein?: number;
+  experienceLevel?: string;
+  equipment?: string;
+  workoutDays?: number;
+  nutritionLogs?: { id: string; foodName: string; calories: number; protein: number; date: string }[];
 };
 
 type AppContextType = {
