@@ -43,7 +43,7 @@ export function Workouts() {
   return (
     <div className="dashboard-layout" style={{ gap: '32px' }}>
       {/* Header & Sticky Filter Pills */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '24px', zIndex: 10, padding: '24px', background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', borderRadius: '24px', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '24px', zIndex: 10, padding: '24px', background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius)', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <h2 className="page-title">Exercise Library</h2>
@@ -54,7 +54,7 @@ export function Workouts() {
             style={{
               display: 'flex', alignItems: 'center', gap: '8px',
               padding: '10px 16px', background: 'var(--accent)', color: '#fff',
-              border: 'none', borderRadius: '12px', fontWeight: 600,
+              border: 'none', borderRadius: 'var(--radius)', fontWeight: 600,
               cursor: 'pointer', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
             }}
           >
@@ -140,7 +140,7 @@ export function Workouts() {
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ 
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
-                          padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600,
+                          padding: '4px 10px', borderRadius: 'var(--radius)', fontSize: '0.75rem', fontWeight: 600,
                           backgroundColor: ex.rating === 'Essential' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
                           color: ex.rating === 'Essential' ? '#10b981' : '#3b82f6',
                           border: `1px solid ${ex.rating === 'Essential' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`
@@ -151,7 +151,7 @@ export function Workouts() {
                         
                         <span style={{ 
                           display: 'inline-flex', alignItems: 'center',
-                          padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 500,
+                          padding: '4px 10px', borderRadius: 'var(--radius)', fontSize: '0.75rem', fontWeight: 500,
                           backgroundColor: 'var(--bg-glass)', color: 'var(--text-secondary)', border: '1px solid var(--border-glass)'
                         }}>
                           {ex.target}

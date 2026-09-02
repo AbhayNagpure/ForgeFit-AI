@@ -39,7 +39,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 padding: '10px 12px',
                 fontWeight: 600,
                 fontSize: '0.9rem',
-                borderRadius: '8px',
+                borderRadius: 'var(--radius)',
                 color: activeTab === id ? 'var(--text-primary)' : 'var(--text-secondary)',
                 backgroundColor: activeTab === id ? 'var(--bg-glass-active)' : 'transparent',
               }}
@@ -55,7 +55,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         <button 
           className="nav-link"
           onClick={logout}
-          style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem', padding: '10px 12px', borderRadius: '8px' }}
+          style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem', padding: '10px 12px', borderRadius: 'var(--radius)' }}
         >
           <LogOut size={18} />
           Sign Out

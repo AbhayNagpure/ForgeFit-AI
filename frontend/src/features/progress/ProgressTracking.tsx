@@ -24,7 +24,7 @@ export function ProgressTracking() {
       {/* Top Highlights: Stats Grid */}
       <div className="stats-grid">
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(249, 115, 22, 0.2)', color: '#f97316' }}>
+          <div style={{ padding: '12px', borderRadius: 'var(--radius)', background: 'rgba(249, 115, 22, 0.2)', color: '#f97316' }}>
             <Flame size={28} />
           </div>
           <div>
@@ -36,7 +36,7 @@ export function ProgressTracking() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}>
+          <div style={{ padding: '12px', borderRadius: 'var(--radius)', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}>
             <Scale size={28} />
           </div>
           <div>
@@ -52,7 +52,7 @@ export function ProgressTracking() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+          <div style={{ padding: '12px', borderRadius: 'var(--radius)', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
             <Medal size={28} />
           </div>
           <div>
@@ -75,7 +75,7 @@ export function ProgressTracking() {
                   flex: 1, 
                   height: `${height}%`, 
                   background: i === 6 ? 'linear-gradient(to top, var(--accent), #6ee7b7)' : 'rgba(255, 255, 255, 0.1)', 
-                  borderRadius: '6px 6px 0 0',
+                  borderRadius: 'var(--radius) var(--radius) 0 0',
                   transition: 'height 0.5s ease',
                   position: 'relative'
                 }}
@@ -101,9 +101,9 @@ export function ProgressTracking() {
               </div>
             )}
             {formattedPRs.map((pr, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: 'var(--radius)', border: '1px solid var(--border-glass)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ padding: '8px', borderRadius: '8px', background: `${pr.color}20`, color: pr.color }}>
+                  <div style={{ padding: '8px', borderRadius: 'var(--radius)', background: `${pr.color}20`, color: pr.color }}>
                     <pr.icon size={20} />
                   </div>
                   <div>

@@ -79,7 +79,7 @@ export function AICoach() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
@@ -158,7 +158,7 @@ export function AICoach() {
                 {msg.actions && msg.actions.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
                     {msg.actions.map((action, i) => (
-                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: 'var(--radius)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
                         <Database size={12} />
                         {action.type.replace('_', ' ')}
                       </div>

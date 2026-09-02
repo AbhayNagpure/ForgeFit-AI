@@ -73,7 +73,7 @@ export function Profile() {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
             {/* Nutrition Box */}
-            <div style={{ background: '#000', padding: '16px', borderRadius: '4px', border: '1px solid #27272a', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ background: '#000', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid #27272a', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase' }}>Nutrition</span>
                 <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>via AI Coach</span>
@@ -84,7 +84,7 @@ export function Profile() {
                   <span style={{ fontSize: '0.75rem', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Calories</span>
                   <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{consumedCalories} / {targetCalories} kcal</span>
                 </div>
-                <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
                   <div style={{ width: `${calPercent}%`, height: '100%', background: 'var(--accent)' }} />
                 </div>
               </div>
@@ -94,14 +94,14 @@ export function Profile() {
                   <span style={{ fontSize: '0.75rem', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Protein</span>
                   <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{consumedProtein} / {targetProtein} g</span>
                 </div>
-                <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
                   <div style={{ width: `${proPercent}%`, height: '100%', background: '#ef4444' }} />
                 </div>
               </div>
             </div>
 
             {/* Workout Box */}
-            <div style={{ background: '#000', padding: '16px', borderRadius: '4px', border: '1px solid #27272a', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ background: '#000', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid #27272a', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase' }}>Training</span>
                 <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>via AI Coach</span>
@@ -109,14 +109,14 @@ export function Profile() {
               {todaysWorkouts.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {todaysWorkouts.map(w => (
-                    <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', background: '#18181b', padding: '10px', borderRadius: '4px' }}>
+                    <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', background: '#18181b', padding: '10px', borderRadius: 'var(--radius)' }}>
                       <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{w.name}</span>
                       <span style={{ fontSize: '0.875rem', color: '#a1a1aa' }}>{w.duration} min</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#71717a', fontSize: '0.875rem', fontStyle: 'italic', background: '#18181b', borderRadius: '4px' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#71717a', fontSize: '0.875rem', fontStyle: 'italic', background: '#18181b', borderRadius: 'var(--radius)' }}>
                   No training logged today.
                 </div>
               )}
@@ -166,7 +166,7 @@ export function Profile() {
             {personalRecords.length > 0 ? (
               <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '8px' }}>
                 {personalRecords.map(pr => (
-                  <div key={pr.id} style={{ minWidth: '150px', background: '#000', border: '1px solid #27272a', borderRadius: '4px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div key={pr.id} style={{ minWidth: '150px', background: '#000', border: '1px solid #27272a', borderRadius: 'var(--radius)', padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a1a1aa', textTransform: 'uppercase' }}>{pr.exerciseName}</span>
                       <TrendingUp size={14} color="var(--accent)" />

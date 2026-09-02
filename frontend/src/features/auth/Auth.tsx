@@ -73,7 +73,7 @@ export function Auth() {
         backdropFilter: 'blur(12px)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         padding: '3rem',
-        borderRadius: '24px',
+        borderRadius: 'var(--radius)',
         width: '100%',
         maxWidth: '420px',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
@@ -87,7 +87,7 @@ export function Auth() {
             justifyContent: 'center',
             width: '64px',
             height: '64px',
-            borderRadius: '16px',
+            borderRadius: 'var(--radius)',
             background: 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)',
             marginBottom: '1rem'
           }}>
@@ -107,7 +107,7 @@ export function Auth() {
             border: '1px solid rgba(239, 68, 68, 0.2)',
             color: '#ef4444',
             padding: '0.75rem',
-            borderRadius: '8px',
+            borderRadius: 'var(--radius)',
             marginBottom: '1.5rem',
             textAlign: 'center',
             fontSize: '0.875rem'
@@ -131,7 +131,7 @@ export function Auth() {
                   padding: '0.75rem 1rem 0.75rem 3rem',
                   background: 'rgba(15, 23, 42, 0.6)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius)',
                   color: 'white',
                   outline: 'none',
                   boxSizing: 'border-box'
@@ -153,7 +153,7 @@ export function Auth() {
                 padding: '0.75rem 1rem 0.75rem 3rem',
                 background: 'rgba(15, 23, 42, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius)',
                 color: 'white',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -174,7 +174,7 @@ export function Auth() {
                 padding: '0.75rem 1rem 0.75rem 3rem',
                 background: 'rgba(15, 23, 42, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius)',
                 color: 'white',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -189,7 +189,7 @@ export function Auth() {
               background: 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)',
               color: 'white',
               padding: '0.875rem',
-              borderRadius: '12px',
+              borderRadius: 'var(--radius)',
               border: 'none',
               fontWeight: 'bold',
               display: 'flex',

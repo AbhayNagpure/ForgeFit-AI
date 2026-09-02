@@ -11,7 +11,7 @@ export function Settings() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', width: '100%' }}>
       
       {/* AI Data Entry Notice */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', padding: '16px', borderRadius: '4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', padding: '16px', borderRadius: 'var(--radius)' }}>
         <Info size={20} color="var(--accent)" />
         <span style={{ fontSize: '0.875rem', color: '#eab308', fontWeight: 600 }}>
           This platform is strictly AI-first. To update your name, email, height, goals, or nutrition targets, simply ask the AI Coach.
@@ -73,11 +73,11 @@ export function Settings() {
               />
               <div style={{
                 width: '48px', height: '24px', backgroundColor: notifications ? 'var(--accent)' : 'var(--bg-glass-active)',
-                borderRadius: '4px', transition: 'background-color 0.3s', position: 'relative', border: '1px solid var(--border-color)'
+                borderRadius: 'var(--radius)', transition: 'background-color 0.3s', position: 'relative', border: '1px solid var(--border-color)'
               }}>
                 <div style={{
                   position: 'absolute', top: '2px', left: notifications ? '24px' : '2px', width: '18px', height: '18px',
-                  backgroundColor: notifications ? '#000' : '#fff', borderRadius: '2px', transition: 'left 0.3s ease'
+                  backgroundColor: notifications ? '#000' : '#fff', borderRadius: 'var(--radius)', transition: 'left 0.3s ease'
                 }} />
               </div>
             </div>
@@ -97,7 +97,7 @@ export function Settings() {
             style={{ 
               display: 'flex', alignItems: 'center', gap: '8px',
               padding: '10px 20px', background: 'transparent', border: '1px solid var(--border-color)', 
-              color: 'var(--text-primary)', cursor: 'pointer', borderRadius: '4px', fontWeight: 600, textTransform: 'uppercase', transition: 'all 0.2s'
+              color: 'var(--text-primary)', cursor: 'pointer', borderRadius: 'var(--radius)', fontWeight: 600, textTransform: 'uppercase', transition: 'all 0.2s'
             }}
             onMouseOver={(e) => { e.currentTarget.style.background = 'var(--bg-glass-active)'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
