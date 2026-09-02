@@ -73,12 +73,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.userId;
-    if (!userId) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const user = await prisma.user.findUnique({ 
+      where: { id: req.user?.userId },
+      include: {
+        nutritionLogs: {
+          where: {
+            date: {
+              gte: today
+            }
+          }
+        }
+      }
+    });
+
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
@@ -91,7 +101,13 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
       weight: user.weight,
       height: user.height,
       age: user.age,
-      gender: user.gender
+      gender: user.gender,
+      dailyCalories: user.dailyCalories,
+      dailyProtein: user.dailyProtein,
+      experienceLevel: user.experienceLevel,
+      equipment: user.equipment,
+      workoutDays: user.workoutDays,
+      nutritionLogs: user.nutritionLogs
     } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });

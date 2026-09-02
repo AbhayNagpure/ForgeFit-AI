@@ -20,6 +20,7 @@ export class GeminiService {
 
     const systemInstruction = `You are ForgeFit AI, an elite autonomous personal fitness coach. Keep answers concise, factual, and data-driven.
 You have full access to the user's database. If the user asks to log, update, or retrieve ANY data (workouts, exercises, PRs, weight, goals, body metrics), YOU MUST use the provided tools to execute it for them. NEVER tell the user to do it manually if a tool exists.
+IMPORTANT: All weight units in the system MUST be in kilograms (kg). If the user provides a weight in lbs, you MUST convert it to kg (divide by 2.20462) before saving it to the database using the tools. Always display weights to the user in kg.
 
 ${userContext}`;
 
@@ -48,7 +49,7 @@ ${userContext}`;
               name: { type: Type.STRING, description: 'Exercise name' },
               sets: { type: Type.INTEGER },
               reps: { type: Type.INTEGER },
-              weight: { type: Type.NUMBER, description: 'Weight lifted' }
+              weight: { type: Type.NUMBER, description: 'Weight lifted in kg' }
             },
             required: ['workoutId', 'name', 'sets', 'reps']
           }
@@ -70,7 +71,7 @@ ${userContext}`;
             type: Type.OBJECT,
             properties: {
               exerciseName: { type: Type.STRING },
-              weight: { type: Type.NUMBER },
+              weight: { type: Type.NUMBER, description: 'Weight lifted in kg' },
               reps: { type: Type.INTEGER }
             },
             required: ['exerciseName', 'weight']
@@ -96,11 +97,24 @@ ${userContext}`;
           }
         },
         {
+          name: 'logNutrition',
+          description: 'Logs food consumed by the user today. Call this when the user says "I ate chicken", "I had 2 eggs", etc. You MUST estimate the calories and protein.',
+          parameters: {
+            type: Type.OBJECT,
+            properties: {
+              foodName: { type: Type.STRING, description: 'Description of the food (e.g., 2 Eggs, Grilled Chicken)' },
+              calories: { type: Type.INTEGER, description: 'Estimated calories' },
+              protein: { type: Type.INTEGER, description: 'Estimated protein in grams' }
+            },
+            required: ['foodName', 'calories', 'protein']
+          }
+        },
+        {
           name: 'logWeight',
           description: 'Logs the users current body weight.',
           parameters: {
             type: Type.OBJECT,
-            properties: { weight: { type: Type.NUMBER } },
+            properties: { weight: { type: Type.NUMBER, description: 'User weight in kg' } },
             required: ['weight']
           }
         },
@@ -116,10 +130,15 @@ ${userContext}`;
             type: Type.OBJECT,
             properties: { 
               goal: { type: Type.STRING },
-              weight: { type: Type.NUMBER },
+              weight: { type: Type.NUMBER, description: 'Weight in kg' },
               height: { type: Type.NUMBER },
               age: { type: Type.INTEGER },
-              gender: { type: Type.STRING }
+              gender: { type: Type.STRING },
+              dailyCalories: { type: Type.INTEGER, description: 'Target daily calories' },
+              dailyProtein: { type: Type.INTEGER, description: 'Target daily protein in grams' },
+              experienceLevel: { type: Type.STRING, description: 'e.g. Beginner, Intermediate, Advanced' },
+              equipment: { type: Type.STRING, description: 'e.g. Full Gym, Dumbbells Only, Bodyweight' },
+              workoutDays: { type: Type.INTEGER, description: 'Number of workout days per week' }
             }
           }
         }
@@ -190,6 +209,11 @@ ${userContext}`;
               actionsTaken.push({ type: 'METRICS_LOGGED', data: metric });
               functionResponseResult = `Body metrics logged successfully.`;
               break;
+            case 'logNutrition':
+              const log = await prisma.nutritionLog.create({ data: { userId, foodName: args.foodName, calories: args.calories, protein: args.protein } });
+              actionsTaken.push({ type: 'NUTRITION_LOGGED', data: log });
+              functionResponseResult = `Nutrition logged successfully: ${args.foodName}`;
+              break;
             case 'logWeight':
               const weightLog = await prisma.weightLog.create({ data: { userId, weight: args.weight } });
               actionsTaken.push({ type: 'WEIGHT_LOGGED', data: weightLog });
@@ -206,6 +230,11 @@ ${userContext}`;
               if (args.height) updateData.height = args.height;
               if (args.age) updateData.age = args.age;
               if (args.gender) updateData.gender = args.gender;
+              if (args.dailyCalories) updateData.dailyCalories = args.dailyCalories;
+              if (args.dailyProtein) updateData.dailyProtein = args.dailyProtein;
+              if (args.experienceLevel) updateData.experienceLevel = args.experienceLevel;
+              if (args.equipment) updateData.equipment = args.equipment;
+              if (args.workoutDays) updateData.workoutDays = args.workoutDays;
 
               await prisma.user.update({ where: { id: userId }, data: updateData });
               

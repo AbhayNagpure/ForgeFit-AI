@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { apiRequest } from '../../api';
 import { useAppContext } from '../../context/AppContext';
-import { Trash2, Send, Bot, User, ChevronRight, Activity, Target, Database } from 'lucide-react';
+import { Trash2, Send, Cpu, User, Database, Plus } from 'lucide-react';
 
 type Message = {
   role: 'user' | 'ai';
@@ -13,7 +13,7 @@ type Message = {
 export function AICoach() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchWorkouts, fetchPersonalRecords, fetchBodyMetrics, refreshProfile, userProfile } = useAppContext();
+  const { fetchWorkouts, fetchPersonalRecords, fetchBodyMetrics, refreshProfile } = useAppContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -21,7 +21,7 @@ export function AICoach() {
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { }
     }
-    return [{ role: 'ai', text: 'ForgeFit AI Engine Initialized. Ready to process telemetry and execute commands.' }];
+    return [{ role: 'ai', text: 'Hi! I am your ForgeFit AI Coach. I can log your workouts, track your meals, and update your profile. What would you like to do today?' }];
   });
 
   useEffect(() => {
@@ -30,13 +30,9 @@ export function AICoach() {
   }, [messages]);
 
   const handleClearHistory = () => {
-    if (confirm('Clear telemetry and chat logs?')) {
-      setMessages([{ role: 'ai', text: 'System logs cleared. Awaiting input.' }]);
+    if (confirm('Clear chat history?')) {
+      setMessages([{ role: 'ai', text: 'Chat history cleared. How can I help you?' }]);
     }
-  };
-
-  const executePrompt = (promptText: string) => {
-    setInputText(promptText);
   };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -49,220 +45,203 @@ export function AICoach() {
     setIsLoading(true);
 
     try {
-      const history = messages.slice(1).map(m => ({ role: m.role, text: m.text }));
-      
-      const data = await apiRequest('/chat', {
+      const response = await apiRequest('/api/ai/chat', {
         method: 'POST',
-        body: JSON.stringify({ message: userMessage, history })
+        body: JSON.stringify({ message: userMessage }),
       });
-
+      const data = await response.json();
+      
       if (data.actionsTaken && data.actionsTaken.length > 0) {
         data.actionsTaken.forEach((action: any) => {
            if (action.type === 'WORKOUT_ADDED' || action.type === 'WORKOUT_DELETED') fetchWorkouts();
            if (action.type === 'PR_ADDED') fetchPersonalRecords();
            if (action.type === 'METRICS_LOGGED' || action.type === 'WEIGHT_LOGGED') fetchBodyMetrics();
-           if (action.type === 'PROFILE_UPDATED' || action.type === 'GOAL_UPDATED') refreshProfile();
+           if (action.type === 'PROFILE_UPDATED' || action.type === 'GOAL_UPDATED' || action.type === 'NUTRITION_LOGGED') refreshProfile();
         });
       }
       
       if (data.reply) {
         setMessages(prev => [...prev, { role: 'ai', text: data.reply, actions: data.actionsTaken }]);
       } else {
-        setMessages(prev => [...prev, { role: 'ai', text: 'ERR: System encountered an unexpected fault.' }]);
+        setMessages(prev => [...prev, { role: 'ai', text: 'Error: System encountered an unexpected fault.' }]);
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'ERR: Connection to AI core lost.' }]);
+      setMessages(prev => [...prev, { role: 'ai', text: 'Error: Connection to AI core lost.' }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const quickPrompts = [
-    "Analyze my recent workouts and suggest improvements.",
-    "Log a new Personal Record: Bench Press 225lbs x 3",
-    "What should my macronutrients look like on rest days?",
-    "Generate a 4-day push/pull/legs routine."
+    "Log 300 calories of chicken.",
+    "I weigh 85kg now.",
+    "I hit a new PR on Bench Press: 100kg for 5 reps."
   ];
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 120px)', gap: '1rem', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
       
-      {/* LEFT PANEL: Context & Dashboard (Utilitarian Data-Dense) */}
-      <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        
-        {/* System Status Card */}
-        <div style={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '6px', padding: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #374151', paddingBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>System Context</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#10b981', fontSize: '0.75rem' }}>
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></div> ONLINE
-            </div>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e5e7eb' }}>
-              <User size={14} color="#60a5fa" />
-              <span>User: <strong>{userProfile?.name || 'Active'}</strong></span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e5e7eb' }}>
-              <Target size={14} color="#f43f5e" />
-              <span>Goal: <strong>{userProfile?.goal || 'Unspecified'}</strong></span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e5e7eb' }}>
-              <Database size={14} color="#fbbf24" />
-              <span>Modules: <strong>Connected (6/6)</strong></span>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Commands Card */}
-        <div style={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '6px', padding: '1rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem', borderBottom: '1px solid #374151', paddingBottom: '0.5rem' }}>
-            Quick Commands
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto' }}>
-            {quickPrompts.map((prompt, idx) => (
-              <button 
-                key={idx}
-                onClick={() => executePrompt(prompt)}
-                style={{ 
-                  textAlign: 'left', 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #374151', 
-                  color: '#d1d5db',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#374151'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1f2937'}
-              >
-                <span style={{ maxWidth: '85%' }}>{prompt}</span>
-                <ChevronRight size={14} color="#9ca3af" />
-              </button>
-            ))}
-          </div>
-        </div>
-
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Cpu size={20} color="var(--accent)" />
+          Forge AI
+        </h2>
+        <button 
+          onClick={handleClearHistory} 
+          style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', transition: 'color 0.2s' }}
+          onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
+          onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+        >
+          <Trash2 size={16} /> Clear Chat
+        </button>
       </div>
 
-      {/* RIGHT PANEL: The Terminal/Chat Area */}
-      <div style={{ flexGrow: 1, backgroundColor: '#0f172a', border: '1px solid #374151', borderRadius: '6px', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)' }}>
-        
-        {/* Terminal Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', backgroundColor: '#1e293b', borderBottom: '1px solid #374151' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Bot size={16} color="#38bdf8" />
-            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#f1f5f9', fontFamily: 'monospace' }}>AI_COACH_INTERFACE.exe</span>
-          </div>
-          <button onClick={handleClearHistory} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem' }} title="Wipe Memory">
-            <Trash2 size={14} /> WIPE_MEM
-          </button>
-        </div>
+      {/* Chat Area */}
+      <div style={{ flexGrow: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', scrollBehavior: 'smooth' }}>
+        <div style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          
+          {messages.length === 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginTop: '24px' }}>
+              {quickPrompts.map((prompt, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => { setInputText(prompt); }}
+                  style={{ 
+                    backgroundColor: 'transparent', 
+                    border: '1px solid var(--border-color)', 
+                    color: 'var(--text-primary)',
+                    padding: '8px 16px',
+                    borderRadius: '24px',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
 
-        {/* Chat History */}
-        <div style={{ flexGrow: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', scrollBehavior: 'smooth' }}>
           {messages.map((msg, idx) => (
-            <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+            <div key={idx} style={{ display: 'flex', gap: '16px', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
               
-              <div style={{ 
-                maxWidth: '85%', 
-                padding: '1rem', 
-                borderRadius: '6px',
-                backgroundColor: msg.role === 'user' ? '#1e293b' : 'transparent',
-                border: msg.role === 'user' ? '1px solid #334155' : 'none',
-                color: '#f8fafc',
-                fontFamily: msg.role === 'ai' ? 'inherit' : 'monospace'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: msg.role === 'user' ? '#94a3b8' : '#38bdf8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  {msg.role === 'ai' ? <Bot size={14} /> : <User size={14} />}
-                  {msg.role === 'ai' ? 'ForgeFit AI' : 'CMD_INPUT'}
+              {msg.role === 'ai' && (
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Cpu size={18} color="#000" />
                 </div>
-                
+              )}
+
+              <div style={{ 
+                maxWidth: '80%', 
+                padding: '12px 16px', 
+                borderRadius: '16px',
+                borderTopRightRadius: msg.role === 'user' ? '4px' : '16px',
+                borderTopLeftRadius: msg.role === 'ai' ? '4px' : '16px',
+                backgroundColor: msg.role === 'user' ? '#27272a' : 'transparent',
+                color: 'var(--text-primary)',
+                lineHeight: '1.6',
+                fontSize: '1rem'
+              }}>
                 {msg.role === 'user' ? (
-                  <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.5', fontSize: '0.9rem' }}>{msg.text}</div>
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
                 ) : (
-                  <div className="markdown-body" style={{ lineHeight: '1.6', fontSize: '0.95rem', color: '#e2e8f0' }}>
+                  <div className="markdown-body">
                     <ReactMarkdown>{msg.text}</ReactMarkdown>
+                  </div>
+                )}
+
+                {/* Data Execution Chips */}
+                {msg.actions && msg.actions.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+                    {msg.actions.map((action, i) => (
+                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                        <Database size={12} />
+                        {action.type.replace('_', ' ')}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* Data Execution Chips */}
-              {msg.actions && msg.actions.length > 0 && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', marginLeft: msg.role === 'ai' ? '1rem' : '0' }}>
-                  {msg.actions.map((action, i) => (
-                    <div key={i} style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', color: '#34d399', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontFamily: 'monospace' }}>
-                      <Activity size={12} />
-                      {action.type === 'WORKOUT_ADDED' ? 'SYS_DB_WRITE: WORKOUT' : 
-                       action.type === 'PR_ADDED' ? 'SYS_DB_WRITE: PR_LOGGED' : 
-                       action.type === 'METRICS_LOGGED' ? 'SYS_DB_WRITE: BODY_METRICS' : 
-                       action.type === 'PROFILE_UPDATED' ? 'SYS_DB_WRITE: PROFILE' : 'SYS_DB_WRITE: SUCCESS'}
-                    </div>
-                  ))}
+              {msg.role === 'user' && (
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#27272a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <User size={18} color="#a1a1aa" />
                 </div>
               )}
-              
+
             </div>
           ))}
+
           {isLoading && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginLeft: '1rem' }}>
-               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#38bdf8', fontSize: '0.8rem', fontFamily: 'monospace' }}>
-                  <Bot size={14} className="animate-pulse" /> <em>Processing request...</em>
-               </div>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Cpu size={18} color="#000" />
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="animate-pulse" style={{ width: '8px', height: '8px', backgroundColor: 'var(--accent)', borderRadius: '50%' }}></div>
+                Thinking...
+              </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} style={{ height: '40px' }} />
         </div>
-
-        {/* Input Area */}
-        <div style={{ padding: '1rem', backgroundColor: '#1e293b', borderTop: '1px solid #374151' }}>
-          <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.5rem' }}>
-            <input 
-              type="text" 
-              placeholder="Enter command or natural language request..." 
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              disabled={isLoading}
-              style={{ 
-                flexGrow: 1, 
-                backgroundColor: '#0f172a', 
-                border: '1px solid #475569', 
-                color: '#f8fafc',
-                padding: '0.75rem 1rem',
-                borderRadius: '4px',
-                fontFamily: 'monospace',
-                fontSize: '0.9rem',
-                outline: 'none'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#38bdf8'}
-              onBlur={(e) => e.target.style.borderColor = '#475569'}
-            />
-            <button type="submit" disabled={isLoading || !inputText.trim()} style={{ 
-              backgroundColor: '#38bdf8', 
-              color: '#0f172a', 
-              border: 'none', 
-              padding: '0 1.5rem', 
-              borderRadius: '4px',
-              fontWeight: 600,
-              cursor: (isLoading || !inputText.trim()) ? 'not-allowed' : 'pointer',
-              opacity: (isLoading || !inputText.trim()) ? 0.5 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}>
-              <Send size={16} /> EXECUTE
-            </button>
-          </form>
-        </div>
-
       </div>
+
+      {/* Input Area */}
+      <div style={{ padding: '0 24px 24px 24px', display: 'flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
+        <form onSubmit={handleSendMessage} style={{ 
+          display: 'flex', 
+          width: '100%', 
+          maxWidth: '800px', 
+          backgroundColor: '#18181b', 
+          border: '1px solid #3f3f46', 
+          borderRadius: '24px',
+          padding: '8px 12px',
+          alignItems: 'center',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+          transition: 'border-color 0.2s'
+        }}>
+          <button type="button" style={{ background: 'none', border: 'none', color: '#a1a1aa', padding: '8px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <Plus size={20} />
+          </button>
+          <input 
+            type="text" 
+            placeholder="Message Forge AI..." 
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            disabled={isLoading}
+            style={{ 
+              flexGrow: 1, 
+              backgroundColor: 'transparent', 
+              border: 'none', 
+              color: '#fff',
+              padding: '8px 12px',
+              fontSize: '1rem',
+              outline: 'none'
+            }}
+          />
+          <button type="submit" disabled={isLoading || !inputText.trim()} style={{ 
+            backgroundColor: (isLoading || !inputText.trim()) ? '#27272a' : 'var(--accent)', 
+            color: (isLoading || !inputText.trim()) ? '#71717a' : '#000', 
+            border: 'none', 
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: (isLoading || !inputText.trim()) ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s'
+          }}>
+            <Send size={16} style={{ marginLeft: '2px' }} />
+          </button>
+        </form>
+      </div>
+
     </div>
   );
 }

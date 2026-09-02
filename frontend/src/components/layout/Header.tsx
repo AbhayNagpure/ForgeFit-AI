@@ -6,6 +6,8 @@ type HeaderProps = {
 };
 
 export function Header({ activeTab }: HeaderProps) {
+  if (activeTab === 'coach') return null;
+
   return (
     <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
       <div>

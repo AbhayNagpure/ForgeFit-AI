@@ -13,7 +13,7 @@ import { useAppContext } from './context/AppContext';
 import { Loader2 } from 'lucide-react';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('coach');
   const { isAuthenticated, isLoadingAuth } = useAppContext();
 
   if (isLoadingAuth) {

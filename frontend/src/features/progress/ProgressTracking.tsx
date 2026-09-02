@@ -12,7 +12,7 @@ export function ProgressTracking() {
   // Format PRs nicely from the backend
   const formattedPRs = personalRecords.slice(0, 5).map((pr, idx) => ({
     name: pr.exerciseName,
-    weight: `${pr.weight} lbs`, // Or kg depending on preference
+    weight: `${pr.weight} kg`,
     date: new Date(pr.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     icon: idx % 2 === 0 ? Dumbbell : Trophy,
     color: idx % 3 === 0 ? '#ef4444' : idx % 3 === 1 ? '#3b82f6' : '#eab308'

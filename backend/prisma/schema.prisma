@@ -17,6 +17,11 @@ model User {
   height    Float?
   age       Int?
   gender    String?
+  dailyCalories Int?
+  dailyProtein  Int?
+  experienceLevel String?
+  equipment       String?
+  workoutDays     Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -24,6 +29,17 @@ model User {
   weightLogs      WeightLog[]
   personalRecords PersonalRecord[]
   bodyMetrics     BodyMetric[]
+  nutritionLogs   NutritionLog[]
+}
+
+model NutritionLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foodName  String
+  calories  Int
+  protein   Int
+  date      DateTime @default(now())
 }
 
 model Workout {
