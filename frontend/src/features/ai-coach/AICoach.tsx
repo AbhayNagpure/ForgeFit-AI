@@ -45,11 +45,10 @@ export function AICoach() {
     setIsLoading(true);
 
     try {
-      const response = await apiRequest('/api/ai/chat', {
+      const data = await apiRequest('/chat', {
         method: 'POST',
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, history: messages }),
       });
-      const data = await response.json();
       
       if (data.actionsTaken && data.actionsTaken.length > 0) {
         data.actionsTaken.forEach((action: any) => {
