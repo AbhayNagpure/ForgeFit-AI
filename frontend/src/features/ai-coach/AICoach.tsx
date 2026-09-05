@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { apiRequest } from '../../api';
 import { useAppContext } from '../../context/AppContext';
-import { Trash2, Send, Cpu, User, Database, Plus } from 'lucide-react';
+import { Trash2, Send, Cpu, User, Database, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 type Message = {
   role: 'user' | 'ai';
@@ -13,8 +13,11 @@ type Message = {
 export function AICoach() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isVoiceOutputEnabled, setIsVoiceOutputEnabled] = useState(true);
   const { fetchWorkouts, fetchPersonalRecords, fetchBodyMetrics, refreshProfile } = useAppContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('forgefit_ai_history');
@@ -31,13 +34,79 @@ export function AICoach() {
 
   const handleClearHistory = () => {
     if (confirm('Clear chat history?')) {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       setMessages([{ role: 'ai', text: 'Chat history cleared. How can I help you?' }]);
+    }
+  };
+
+  const speakText = (text: string) => {
+    if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    
+    // Strip basic markdown formatting
+    const cleanText = text.replace(/(\*\*|\*|#|_|`)/g, '');
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.05; // Slightly faster for a snappy AI feel
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      if (!recognitionRef.current) {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          alert('Voice input is not supported in this browser.');
+          return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        
+        recognition.onresult = (event: any) => {
+          let currentTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              currentTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (currentTranscript) {
+            setInputText(prev => prev + (prev ? ' ' : '') + currentTranscript);
+          }
+        };
+        
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+        
+        recognitionRef.current = recognition;
+      }
+      
+      try {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Stop AI talking when user starts speaking
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        console.error('Speech recognition error', e);
+      }
     }
   };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim()) return;
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop AI from talking over the new request
+    }
 
     const userMessage = inputText.trim();
     setInputText('');
@@ -61,11 +130,16 @@ export function AICoach() {
       
       if (data.reply) {
         setMessages(prev => [...prev, { role: 'ai', text: data.reply, actions: data.actionsTaken }]);
+        speakText(data.reply);
       } else {
-        setMessages(prev => [...prev, { role: 'ai', text: 'Error: System encountered an unexpected fault.' }]);
+        const errText = 'Error: System encountered an unexpected fault.';
+        setMessages(prev => [...prev, { role: 'ai', text: errText }]);
+        speakText(errText);
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Error: Connection to AI core lost.' }]);
+      const errText = 'Error: Connection to AI core lost.';
+      setMessages(prev => [...prev, { role: 'ai', text: errText }]);
+      speakText(errText);
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +152,7 @@ export function AICoach() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', backgroundColor: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
@@ -86,14 +160,23 @@ export function AICoach() {
           <Cpu size={20} color="var(--accent)" />
           Forge AI
         </h2>
-        <button 
-          onClick={handleClearHistory} 
-          style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', transition: 'color 0.2s' }}
-          onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
-          onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-        >
-          <Trash2 size={16} /> Clear Chat
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {isListening && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444', fontSize: '0.8rem', fontWeight: 600, animation: 'pulse 2s infinite' }}>
+              <div style={{ width: '8px', height: '8px', backgroundColor: '#ef4444', borderRadius: '50%' }}></div>
+              Listening...
+            </div>
+          )}
+          
+          <button 
+            onClick={handleClearHistory} 
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', transition: 'color 0.2s' }}
+            onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
+            onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+          >
+            <Trash2 size={16} /> Clear Chat
+          </button>
+        </div>
       </div>
 
       {/* Chat Area */}
@@ -157,7 +240,7 @@ export function AICoach() {
                 {msg.actions && msg.actions.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
                     {msg.actions.map((action, i) => (
-                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: 'var(--radius)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
                         <Database size={12} />
                         {action.type.replace('_', ' ')}
                       </div>
@@ -202,14 +285,58 @@ export function AICoach() {
           padding: '8px 12px',
           alignItems: 'center',
           boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-          transition: 'border-color 0.2s'
+          transition: 'border-color 0.2s',
+          ...(isListening ? { borderColor: 'var(--accent)', boxShadow: '0 0 16px rgba(234, 179, 8, 0.2)' } : {})
         }}>
-          <button type="button" style={{ background: 'none', border: 'none', color: '#a1a1aa', padding: '8px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-            <Plus size={20} />
-          </button>
+          
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <button 
+              type="button" 
+              onClick={() => {
+                if (isVoiceOutputEnabled && 'speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setIsVoiceOutputEnabled(!isVoiceOutputEnabled);
+              }} 
+              style={{ 
+                background: isVoiceOutputEnabled ? 'rgba(255, 255, 255, 0.05)' : 'none', 
+                border: 'none', 
+                color: isVoiceOutputEnabled ? '#f8fafc' : '#71717a', 
+                padding: '8px', 
+                borderRadius: '50%',
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              title={isVoiceOutputEnabled ? "Mute AI Voice" : "Enable AI Voice"}
+            >
+              {isVoiceOutputEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            </button>
+
+            <button 
+              type="button" 
+              onClick={toggleListening}
+              style={{ 
+                background: isListening ? 'rgba(234, 179, 8, 0.2)' : 'none', 
+                border: 'none', 
+                color: isListening ? 'var(--accent)' : '#a1a1aa', 
+                padding: '8px', 
+                borderRadius: '50%',
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              title={isListening ? "Stop listening" : "Start voice dictation"}
+            >
+              {isListening ? <Mic size={20} /> : <MicOff size={20} />}
+            </button>
+          </div>
+          
           <input 
             type="text" 
-            placeholder="Message Forge AI..." 
+            placeholder={isListening ? "Listening..." : "Message Forge AI..."} 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isLoading}
@@ -220,12 +347,13 @@ export function AICoach() {
               color: '#fff',
               padding: '8px 12px',
               fontSize: '1rem',
-              outline: 'none'
+              outline: 'none',
+              marginLeft: '4px'
             }}
           />
-          <button type="submit" disabled={isLoading || !inputText.trim()} style={{ 
-            backgroundColor: (isLoading || !inputText.trim()) ? '#27272a' : 'var(--accent)', 
-            color: (isLoading || !inputText.trim()) ? '#71717a' : '#000', 
+          <button type="submit" disabled={isLoading || (!inputText.trim() && !isListening)} style={{ 
+            backgroundColor: (isLoading || (!inputText.trim() && !isListening)) ? '#27272a' : 'var(--accent)', 
+            color: (isLoading || (!inputText.trim() && !isListening)) ? '#71717a' : '#000', 
             border: 'none', 
             width: '36px',
             height: '36px',
@@ -233,7 +361,7 @@ export function AICoach() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: (isLoading || !inputText.trim()) ? 'not-allowed' : 'pointer',
+            cursor: (isLoading || (!inputText.trim() && !isListening)) ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s'
           }}>
             <Send size={16} style={{ marginLeft: '2px' }} />
