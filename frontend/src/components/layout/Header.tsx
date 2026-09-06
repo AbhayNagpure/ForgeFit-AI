@@ -12,6 +12,7 @@ export function Header({ activeTab }: HeaderProps) {
     <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
       <div>
         <h1 className="page-title">
+          {activeTab === 'today' && "Today's Activity"}
           {activeTab === 'profile' && 'Profile & Settings'}
           {activeTab === 'workouts' && 'Workouts'}
           {activeTab === 'progress' && 'Progress Tracking'}
@@ -19,6 +20,7 @@ export function Header({ activeTab }: HeaderProps) {
           {activeTab === 'coach' && 'AI Personal Coach'}
         </h1>
         <p className="page-subtitle">
+          {activeTab === 'today' && 'Track your daily dashboard and goals.'}
           {activeTab === 'profile' && 'Manage your account, settings, and baseline metrics.'}
           {activeTab === 'workouts' && 'Log and track your training sessions.'}
           {activeTab === 'progress' && 'View your historical data and charts.'}
