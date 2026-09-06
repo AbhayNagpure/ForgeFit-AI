@@ -1,4 +1,4 @@
-import { Activity, Dumbbell, LineChart, Apple, User, LogOut, Cpu } from 'lucide-react';
+import { Activity, Dumbbell, LineChart, User, LogOut, Cpu, Calendar } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 type SidebarProps = {
@@ -11,10 +11,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   
   const navItems = [
     { id: 'coach', label: 'Forge AI', icon: Cpu, isAI: true },
+    { id: 'today', label: 'Today', icon: Calendar },
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'workouts', label: 'Workouts', icon: Dumbbell },
-    { id: 'progress', label: 'Progress', icon: LineChart },
-    { id: 'nutrition', label: 'Nutrition', icon: Apple },
+    { id: 'progress', label: 'Progress', icon: LineChart }
   ];
 
   return (
@@ -25,7 +25,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           <span style={{ fontWeight: 800, fontSize: '1.25rem' }}>ForgeFit</span>
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {navItems.map(({ id, label, icon: Icon }) => (
+          {navItems.map(({ id, label, icon: Icon, isAI }) => (
             <button 
               key={id}
               className={`nav-link ${activeTab === id ? 'active' : ''}`}
@@ -37,21 +37,26 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 alignItems: 'center', 
                 gap: '12px',
                 padding: '10px 12px',
-                fontWeight: 600,
+                fontWeight: isAI && activeTab === id ? 700 : 600,
                 fontSize: '0.9rem',
                 borderRadius: '8px',
-                color: activeTab === id ? 'var(--text-primary)' : 'var(--text-secondary)',
-                backgroundColor: activeTab === id ? 'var(--bg-glass-active)' : 'transparent',
+                color: activeTab === id 
+                  ? (isAI ? 'var(--accent)' : 'var(--text-primary)') 
+                  : 'var(--text-secondary)',
+                backgroundColor: activeTab === id 
+                  ? (isAI ? 'rgba(234, 179, 8, 0.15)' : 'var(--bg-glass-active)') 
+                  : 'transparent',
+                border: isAI && activeTab === id ? '1px solid rgba(234, 179, 8, 0.3)' : '1px solid transparent'
               }}
             >
-              <Icon size={18} />
+              <Icon size={18} color={isAI && activeTab === id ? 'var(--accent)' : 'currentColor'} />
               {label}
             </button>
           ))}
         </nav>
       </div>
-      
-      <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+
+      <div>
         <button 
           className="nav-link"
           onClick={logout}
