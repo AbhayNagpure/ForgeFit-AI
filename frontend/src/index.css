@@ -537,43 +537,74 @@ textarea.form-control {
   flex: 1;
 }
 
+
 /* 📱 Responsive Design / Mobile Layout */
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
   }
 
+  /* Transform Sidebar into Bottom Navigation */
   .sidebar {
     width: 100%;
+    height: 70px;
     border-right: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: 16px;
-    position: static;
-    height: auto;
-    overflow-y: visible;
+    border-top: 1px solid var(--border-color);
+    padding: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    flex-direction: row;
+    background: rgba(18, 18, 20, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    justify-content: space-around;
+  }
+
+  /* Hide brand and logout button in bottom nav */
+  .sidebar > div:first-child .brand {
+    display: none;
+  }
+  
+  .sidebar > div:last-child {
+    display: none; /* Hides sign out */
+  }
+
+  .sidebar > div:first-child {
+    width: 100%;
   }
 
   .sidebar nav {
     display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 8px;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+    gap: 0;
   }
 
   .sidebar .nav-link {
-    white-space: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px !important;
+    padding: 8px !important;
     width: auto !important;
-    text-align: center !important;
-    padding: 8px 16px;
+    background: transparent !important;
+    border: none !important;
   }
-
-  .brand {
-    margin-bottom: 16px;
-    text-align: center;
+  
+  .sidebar .nav-link span, .sidebar .nav-link.active {
+    font-size: 0.65rem !important;
+  }
+  
+  .sidebar .nav-link.active {
+    color: var(--accent) !important;
   }
 
   .main-content {
-    padding: 20px 16px;
+    padding: 16px;
+    padding-bottom: 90px; /* Leave space for bottom nav */
   }
 
   .dashboard-columns {
@@ -582,15 +613,15 @@ textarea.form-control {
 
   .form-row {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   .ai-coach-container {
-    height: 70vh;
+    height: calc(100vh - 70px);
   }
 
   .chat-message {
-    max-width: 90%;
+    max-width: 95%;
   }
 }
 
@@ -609,4 +640,33 @@ textarea.form-control {
   width: 100%;
   max-width: 480px;
   padding: 40px 32px;
+}
+
+/* AI Coach Desktop Layout */
+.ai-coach-wrapper {
+  display: flex; 
+  flex-direction: column; 
+  height: calc(100vh - 64px); 
+  background-color: var(--bg-surface); 
+  border-radius: var(--radius); 
+  border: 1px solid var(--border-color); 
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .ai-coach-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 70px); /* Fill space until bottom nav */
+    z-index: 40;
+    border-radius: 0; 
+    border: none;
+  }
+  
+  /* Hide the page header when AI is active on mobile (it's handled by wrapper) */
+  .ai-active .page-header {
+    display: none;
+  }
 }

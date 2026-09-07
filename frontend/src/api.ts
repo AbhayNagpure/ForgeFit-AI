@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 export function setAuthToken(token: string) {
   localStorage.setItem('forgefit_auth_token', token);
