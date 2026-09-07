@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Background Glow -->
+  <circle cx="100" cy="100" r="70" fill="#eab308" opacity="0.15">
+    <animate attributeName="r" values="70;85;70" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.15;0.25;0.15" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <g transform="translate(0, 10)">
+    <animateTransform attributeName="transform" type="translate" values="0,10; 0,0; 0,10" dur="3s" repeatCount="indefinite" />
+    
+    <!-- Body -->
+    <rect x="65" y="80" width="70" height="65" rx="20" fill="#3b82f6" />
+    <!-- Chest Core -->
+    <circle cx="100" cy="115" r="18" fill="#18181b" />
+    <circle cx="100" cy="115" r="12" fill="#eab308">
+      <animate attributeName="r" values="12;14;12" dur="1.5s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite" />
+    </circle>
+    
+    <!-- Head -->
+    <rect x="60" y="20" width="80" height="55" rx="25" fill="#3b82f6" />
+    <!-- Face Screen -->
+    <rect x="70" y="30" width="60" height="30" rx="10" fill="#18181b" />
+    <!-- Eyes -->
+    <ellipse cx="85" cy="45" rx="6" ry="6" fill="#eab308">
+      <!-- Blinking -->
+      <animate attributeName="ry" values="6;6;0.5;6;6" dur="4s" repeatCount="indefinite" keyTimes="0;0.9;0.95;1;1" />
+    </ellipse>
+    <ellipse cx="115" cy="45" rx="6" ry="6" fill="#eab308">
+      <animate attributeName="ry" values="6;6;0.5;6;6" dur="4s" repeatCount="indefinite" keyTimes="0;0.9;0.95;1;1" />
+    </ellipse>
+    <!-- Antenna -->
+    <rect x="98" y="0" width="4" height="20" fill="#71717a" />
+    <circle cx="100" cy="0" r="6" fill="#eab308">
+      <animate attributeName="opacity" values="1;0.3;1" dur="0.75s" repeatCount="indefinite" />
+    </circle>
+    
+    <!-- Left Arm -->
+    <g transform="translate(45, 90)">
+      <animateTransform attributeName="transform" type="rotate" values="0 20 10; -50 20 10; 0 20 10" dur="1.5s" repeatCount="indefinite" />
+      <rect x="0" y="0" width="20" height="40" rx="10" fill="#71717a" />
+      <!-- Dumbbell Handle -->
+      <rect x="-10" y="32" width="40" height="6" rx="2" fill="#18181b" />
+      <!-- Dumbbell Weights -->
+      <rect x="-15" y="22" width="12" height="26" rx="3" fill="#eab308" />
+      <rect x="23" y="22" width="12" height="26" rx="3" fill="#eab308" />
+    </g>
+
+    <!-- Right Arm -->
+    <g transform="translate(135, 90)">
+      <animateTransform attributeName="transform" type="rotate" values="0 0 10; 50 0 10; 0 0 10" dur="1.5s" repeatCount="indefinite" />
+      <rect x="0" y="0" width="20" height="40" rx="10" fill="#71717a" />
+      <!-- Dumbbell Handle -->
+      <rect x="-10" y="32" width="40" height="6" rx="2" fill="#18181b" />
+      <!-- Dumbbell Weights -->
+      <rect x="-15" y="22" width="12" height="26" rx="3" fill="#eab308" />
+      <rect x="23" y="22" width="12" height="26" rx="3" fill="#eab308" />
+    </g>
+
+    <!-- Left Leg -->
+    <rect x="75" y="140" width="18" height="30" rx="8" fill="#71717a" />
+    <!-- Right Leg -->
+    <rect x="107" y="140" width="18" height="30" rx="8" fill="#71717a" />
+  </g>
+</svg>

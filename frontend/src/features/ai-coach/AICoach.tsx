@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { apiRequest } from '../../api';
 import { useAppContext } from '../../context/AppContext';
 import { Trash2, Send, Cpu, User, Database, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Mascot } from '../../components/ui/Mascot';
 
 type Message = {
   role: 'user' | 'ai';
@@ -23,9 +24,17 @@ export function AICoach() {
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('forgefit_ai_history');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { }
+      try { 
+        const parsed = JSON.parse(saved);
+        // Automatically remove old hardcoded greetings that got stuck in local storage
+        const filtered = parsed.filter((m: Message) => 
+          !m.text.includes("Chat history cleared") && 
+          !m.text.includes("Hi! I am your ForgeFit AI Coach")
+        );
+        return filtered;
+      } catch (e) { /* ignore */ }
     }
-    return [{ role: 'ai', text: 'Hi! I am your ForgeFit AI Coach. I can log your workouts, track your meals, and update your profile. What would you like to do today?' }];
+    return [];
   });
 
   useEffect(() => {
@@ -36,19 +45,16 @@ export function AICoach() {
   const handleClearHistory = () => {
     if (confirm('Clear chat history?')) {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      setMessages([{ role: 'ai', text: 'Chat history cleared. How can I help you?' }]);
+      setMessages([]);
     }
   };
 
   const speakText = (text: string) => {
     if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-    
-    // Strip basic markdown formatting
     const cleanText = text.replace(/(\*\*|\*|#|_|`)/g, '');
-    
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 1.05; // Slightly faster for a snappy AI feel
+    utterance.rate = 1.05;
     window.speechSynthesis.speak(utterance);
   };
 
@@ -59,66 +65,43 @@ export function AICoach() {
     } else {
       if (!recognitionRef.current) {
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          alert('Voice input is not supported in this browser.');
-          return;
-        }
+        if (!SpeechRecognition) { alert('Voice input is not supported in this browser.'); return; }
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-        
         recognition.onresult = (event: any) => {
-          let currentTranscript = '';
+          let transcript = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              currentTranscript += event.results[i][0].transcript;
-            }
+            if (event.results[i].isFinal) transcript += event.results[i][0].transcript;
           }
-          if (currentTranscript) {
-            setInputText(prev => prev + (prev ? ' ' : '') + currentTranscript);
+          if (transcript) {
+            setInputText(prev => prev + (prev ? ' ' : '') + transcript);
             if (textareaRef.current) {
               textareaRef.current.style.height = 'auto';
               textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
             }
           }
         };
-        
-        recognition.onend = () => {
-          setIsListening(false);
-        };
-        
+        recognition.onend = () => setIsListening(false);
         recognitionRef.current = recognition;
       }
-      
       try {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Stop AI talking when user starts speaking
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         recognitionRef.current.start();
         setIsListening(true);
-      } catch (e) {
-        console.error('Speech recognition error', e);
-      }
+      } catch (e) { console.error('Speech recognition error', e); }
     }
   };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim()) return;
-
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    }
-
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Stop AI from talking over the new request
-    }
+    if (isListening && recognitionRef.current) { recognitionRef.current.stop(); setIsListening(false); }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
     const userMessage = inputText.trim();
     setInputText('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // reset height on send
-    }
-    
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
@@ -127,38 +110,29 @@ export function AICoach() {
         method: 'POST',
         body: JSON.stringify({ message: userMessage, history: messages }),
       });
-      
-      if (data.actionsTaken && data.actionsTaken.length > 0) {
+      if (data.actionsTaken?.length > 0) {
         data.actionsTaken.forEach((action: any) => {
-           if (action.type === 'WORKOUT_ADDED' || action.type === 'WORKOUT_DELETED') fetchWorkouts();
-           if (action.type === 'PR_ADDED') fetchPersonalRecords();
-           if (action.type === 'METRICS_LOGGED' || action.type === 'WEIGHT_LOGGED') fetchBodyMetrics();
-           if (action.type === 'PROFILE_UPDATED' || action.type === 'GOAL_UPDATED' || action.type === 'NUTRITION_LOGGED') refreshProfile();
+          if (action.type === 'WORKOUT_ADDED' || action.type === 'WORKOUT_DELETED') fetchWorkouts();
+          if (action.type === 'PR_ADDED') fetchPersonalRecords();
+          if (action.type === 'METRICS_LOGGED' || action.type === 'WEIGHT_LOGGED') fetchBodyMetrics();
+          if (action.type === 'PROFILE_UPDATED' || action.type === 'GOAL_UPDATED' || action.type === 'NUTRITION_LOGGED') refreshProfile();
         });
       }
-      
       if (data.reply) {
         setMessages(prev => [...prev, { role: 'ai', text: data.reply, actions: data.actionsTaken }]);
         speakText(data.reply);
       } else {
-        const errText = 'Error: System encountered an unexpected fault.';
-        setMessages(prev => [...prev, { role: 'ai', text: errText }]);
-        speakText(errText);
+        setMessages(prev => [...prev, { role: 'ai', text: 'Error: System encountered an unexpected fault.' }]);
       }
-    } catch (error) {
-      const errText = 'Error: Connection to AI core lost.';
-      setMessages(prev => [...prev, { role: 'ai', text: errText }]);
-      speakText(errText);
+    } catch {
+      setMessages(prev => [...prev, { role: 'ai', text: 'Error: Connection to AI core lost.' }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -169,244 +143,126 @@ export function AICoach() {
     }
   };
 
-  const quickPrompts = [
-    "Log 300 calories of chicken.",
-    "I weigh 85kg now.",
-    "I hit a new PR on Bench Press: 100kg for 5 reps."
-  ];
+  const isEmptyChat = messages.length === 0;
 
   return (
     <div className="ai-coach-wrapper">
-      
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Cpu size={20} color="var(--accent)" />
-          Forge AI
-        </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {isListening && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ef4444', fontSize: '0.8rem', fontWeight: 600, animation: 'pulse 2s infinite' }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#ef4444', borderRadius: '50%' }}></div>
-              Listening...
-            </div>
-          )}
-          
-          <button 
-            onClick={handleClearHistory} 
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', transition: 'color 0.2s' }}
-            onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
-            onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-          >
-            <Trash2 size={16} /> Clear Chat
-          </button>
-        </div>
-      </div>
 
-      {/* Chat Area */}
-      <div style={{ flexGrow: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', scrollBehavior: 'smooth' }}>
-        <div style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          
-          {messages.length === 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginTop: '24px' }}>
-              {quickPrompts.map((prompt, idx) => (
-                <button 
-                  key={idx}
-                  onClick={() => { 
-                    setInputText(prompt); 
-                    if (textareaRef.current) {
-                      textareaRef.current.style.height = 'auto';
-                    }
-                  }}
-                  style={{ 
-                    backgroundColor: 'transparent', 
-                    border: '1px solid var(--border-color)', 
-                    color: 'var(--text-primary)',
-                    padding: '8px 16px',
-                    borderRadius: '24px',
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          )}
+      {/* Chat Area — starts from very top */}
+      <div style={{ flexGrow: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column' }}>
 
-          {messages.map((msg, idx) => (
-            <div key={idx} style={{ display: 'flex', gap: '16px', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              
-              {msg.role === 'ai' && (
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Cpu size={18} color="#000" />
+        {/* Empty state */}
+        {isEmptyChat && (
+          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            {/* Top Left Branding */}
+            <div style={{ padding: '0 4px', marginTop: '12px' }}>
+              <h1 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--accent)' }}>✦</span> ForgeFit AI
+              </h1>
+            </div>
+
+            {/* Centered Mascot & Text */}
+            <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '-40px' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <Mascot state={isListening ? "thinking" : "idle"} size={200} />
+              </div>
+              <p style={{ color: '#71717a', fontSize: '0.95rem', lineHeight: '1.5', maxWidth: '280px', margin: 0, textAlign: 'center' }}>
+                Everything in this app is handled by AI. Just speak or type your updates.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Messages */}
+        {messages.map((msg, idx) => (
+          <div key={idx} style={{ display: 'flex', gap: '10px', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: '20px' }}>
+            {msg.role === 'ai' && (
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                <Cpu size={14} color="#000" />
+              </div>
+            )}
+            <div style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: '14px', borderTopRightRadius: msg.role === 'user' ? '4px' : '14px', borderTopLeftRadius: msg.role === 'ai' ? '4px' : '14px', backgroundColor: msg.role === 'user' ? '#27272a' : 'transparent', color: 'var(--text-primary)', lineHeight: '1.6', fontSize: '0.95rem' }}>
+              {msg.role === 'user' ? (
+                <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+              ) : (
+                <div className="markdown-body"><ReactMarkdown>{msg.text}</ReactMarkdown></div>
+              )}
+              {msg.actions && msg.actions.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
+                  {msg.actions.map((action, i) => (
+                    <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                      <Database size={10} />
+                      {action.type.replace('_', ' ')}
+                    </div>
+                  ))}
                 </div>
               )}
-
-              <div style={{ 
-                maxWidth: '80%', 
-                padding: '12px 16px', 
-                borderRadius: '16px',
-                borderTopRightRadius: msg.role === 'user' ? '4px' : '16px',
-                borderTopLeftRadius: msg.role === 'ai' ? '4px' : '16px',
-                backgroundColor: msg.role === 'user' ? '#27272a' : 'transparent',
-                color: 'var(--text-primary)',
-                lineHeight: '1.6',
-                fontSize: '1rem'
-              }}>
-                {msg.role === 'user' ? (
-                  <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
-                ) : (
-                  <div className="markdown-body">
-                    <ReactMarkdown>{msg.text}</ReactMarkdown>
-                  </div>
-                )}
-
-                {/* Data Execution Chips */}
-                {msg.actions && msg.actions.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-                    {msg.actions.map((action, i) => (
-                      <div key={i} style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '4px 10px', borderRadius: 'var(--radius)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-                        <Database size={12} />
-                        {action.type.replace('_', ' ')}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {msg.role === 'user' && (
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#27272a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <User size={18} color="#a1a1aa" />
-                </div>
-              )}
-
             </div>
-          ))}
+            {msg.role === 'user' && (
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#27272a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                <User size={14} color="#a1a1aa" />
+              </div>
+            )}
+          </div>
+        ))}
 
-          {isLoading && (
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Cpu size={18} color="#000" />
-              </div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div className="animate-pulse" style={{ width: '8px', height: '8px', backgroundColor: 'var(--accent)', borderRadius: '50%' }}></div>
-                Thinking...
-              </div>
+        {isLoading && (
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Cpu size={14} color="#000" />
             </div>
-          )}
-          <div ref={messagesEndRef} style={{ height: '40px' }} />
-        </div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="animate-pulse" style={{ width: '6px', height: '6px', backgroundColor: 'var(--accent)', borderRadius: '50%' }} />
+              Thinking...
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
-      <div style={{ padding: '0 24px 24px 24px', display: 'flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
-        <form onSubmit={handleSendMessage} style={{ 
-          display: 'flex', 
-          width: '100%', 
-          maxWidth: '800px', 
-          backgroundColor: '#18181b', 
-          border: '1px solid #3f3f46', 
-          borderRadius: '24px',
-          padding: '8px 12px',
-          alignItems: 'flex-end', // ALIGN to flex-end so buttons stay bottom as textarea grows
-          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-          transition: 'border-color 0.2s',
-          ...(isListening ? { borderColor: 'var(--accent)', boxShadow: '0 0 16px rgba(234, 179, 8, 0.2)' } : {})
+      <div style={{ flexShrink: 0, padding: '8px 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom, 12px))', borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-glass)' }}>
+        <form onSubmit={handleSendMessage} style={{
+          display: 'flex', width: '100%', backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '20px', padding: '6px 10px', alignItems: 'flex-end',
+          ...(isListening ? { borderColor: 'var(--accent)', boxShadow: '0 0 12px rgba(234, 179, 8, 0.15)' } : {})
         }}>
-          
-          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginBottom: '4px' }}>
-            <button 
-              type="button" 
-              onClick={() => {
-                if (isVoiceOutputEnabled && 'speechSynthesis' in window) {
-                  window.speechSynthesis.cancel();
-                }
-                setIsVoiceOutputEnabled(!isVoiceOutputEnabled);
-              }} 
-              style={{ 
-                background: isVoiceOutputEnabled ? 'rgba(255, 255, 255, 0.05)' : 'none', 
-                border: 'none', 
-                color: isVoiceOutputEnabled ? '#f8fafc' : '#71717a', 
-                padding: '8px', 
-                borderRadius: '50%',
-                display: 'flex', 
-                alignItems: 'center', 
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              title={isVoiceOutputEnabled ? "Mute AI Voice" : "Enable AI Voice"}
-            >
-              {isVoiceOutputEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          <div style={{ display: 'flex', gap: '2px', alignItems: 'center', marginBottom: '4px' }}>
+            <button type="button" onClick={handleClearHistory}
+              style={{ background: 'none', border: 'none', color: '#71717a', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              title="Clear chat">
+              <Trash2 size={16} />
             </button>
-
-            <button 
-              type="button" 
-              onClick={toggleListening}
-              style={{ 
-                background: isListening ? 'rgba(234, 179, 8, 0.2)' : 'none', 
-                border: 'none', 
-                color: isListening ? 'var(--accent)' : '#a1a1aa', 
-                padding: '8px', 
-                borderRadius: '50%',
-                display: 'flex', 
-                alignItems: 'center', 
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              title={isListening ? "Stop listening" : "Start voice dictation"}
-            >
-              {isListening ? <Mic size={20} /> : <MicOff size={20} />}
+            <button type="button" onClick={() => { if (isVoiceOutputEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel(); setIsVoiceOutputEnabled(!isVoiceOutputEnabled); }}
+              style={{ background: 'none', border: 'none', color: isVoiceOutputEnabled ? '#f8fafc' : '#71717a', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              title={isVoiceOutputEnabled ? "Mute AI Voice" : "Enable AI Voice"}>
+              {isVoiceOutputEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            </button>
+            <button type="button" onClick={toggleListening}
+              style={{ background: isListening ? 'rgba(234, 179, 8, 0.2)' : 'none', border: 'none', color: isListening ? 'var(--accent)' : '#a1a1aa', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              title={isListening ? "Stop listening" : "Start voice dictation"}>
+              {isListening ? <Mic size={18} /> : <MicOff size={18} />}
             </button>
           </div>
-          
-          <textarea 
+          <textarea
             ref={textareaRef}
-            placeholder={isListening ? "Listening..." : "Message Forge AI..."} 
+            placeholder={isListening ? "Listening..." : "Message Forge AI..."}
             value={inputText}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             rows={1}
-            style={{ 
-              flexGrow: 1, 
-              backgroundColor: 'transparent', 
-              border: 'none', 
-              color: '#fff',
-              padding: '12px 12px',
-              fontSize: '1rem',
-              outline: 'none',
-              marginLeft: '4px',
-              resize: 'none',
-              maxHeight: '200px',
-              minHeight: '44px',
-              fontFamily: 'inherit',
-              lineHeight: '1.5'
-            }}
+            style={{ flexGrow: 1, backgroundColor: 'transparent', border: 'none', color: '#fff', padding: '10px 8px', fontSize: '0.95rem', outline: 'none', resize: 'none', maxHeight: '200px', minHeight: '40px', fontFamily: 'inherit', lineHeight: '1.5' }}
           />
-          <button type="submit" disabled={isLoading || (!inputText.trim() && !isListening)} style={{ 
-            backgroundColor: (isLoading || (!inputText.trim() && !isListening)) ? '#27272a' : 'var(--accent)', 
-            color: (isLoading || (!inputText.trim() && !isListening)) ? '#71717a' : '#000', 
-            border: 'none', 
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: (isLoading || (!inputText.trim() && !isListening)) ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            marginBottom: '4px',
-            flexShrink: 0
+          <button type="submit" disabled={isLoading || (!inputText.trim() && !isListening)} style={{
+            backgroundColor: (isLoading || (!inputText.trim() && !isListening)) ? '#27272a' : 'var(--accent)',
+            color: (isLoading || (!inputText.trim() && !isListening)) ? '#71717a' : '#000',
+            border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: (isLoading || (!inputText.trim() && !isListening)) ? 'not-allowed' : 'pointer', marginBottom: '4px', flexShrink: 0
           }}>
-            <Send size={16} style={{ marginLeft: '2px' }} />
+            <Send size={14} style={{ marginLeft: '1px' }} />
           </button>
         </form>
       </div>
-
     </div>
   );
 }

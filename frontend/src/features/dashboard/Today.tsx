@@ -1,6 +1,7 @@
 import { useAppContext } from '../../context/AppContext';
 import { CircularTracer } from '../../components/ui/Progress';
-import { Activity, Dumbbell, Utensils, Target, Droplets, Zap, Moon } from 'lucide-react';
+import { Activity, Dumbbell, Utensils, Target } from 'lucide-react';
+import { Mascot } from '../../components/ui/Mascot';
 
 export function Today() {
   const { workouts, userProfile, bodyMetrics } = useAppContext();
@@ -32,21 +33,27 @@ export function Today() {
       {/* Quick Stats Header */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '8px' }}>
         <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ background: 'rgba(234, 179, 8, 0.1)', color: 'var(--accent)', padding: '12px', borderRadius: '50%' }}><Zap size={24} /></div>
+          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Mascot state="running" size={48} animated={false} />
+          </div>
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Active Energy</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{todaysWorkouts.reduce((acc, w) => acc + (w.duration * 8), 0)} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>kcal</span></div>
           </div>
         </div>
         <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', padding: '12px', borderRadius: '50%' }}><Droplets size={24} /></div>
+          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Mascot state="hydration" size={48} animated={false} />
+          </div>
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Water Intake</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>1.2 <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>/ 3.0 L</span></div>
           </div>
         </div>
         <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '12px', borderRadius: '50%' }}><Moon size={24} /></div>
+          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Mascot state="sleep" size={48} animated={false} />
+          </div>
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Sleep</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{todaysSleep} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>hrs</span></div>
