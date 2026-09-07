@@ -8,15 +8,15 @@ import { AuthRequest } from '../middleware/auth.middleware';
 const prisma = new PrismaClient();
 
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  name: z.string().optional(),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
   goal: z.string().optional(),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -40,9 +40,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ user: { id: user.id, email: user.email, name: user.name }, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues });
+      res.status(400).json({ error: error.issues.map(i => i.message).join(', ') });
     } else {
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   }
 };
@@ -64,9 +64,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ user: { id: user.id, email: user.email, name: user.name }, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues });
+      res.status(400).json({ error: error.issues.map(i => i.message).join(', ') });
     } else {
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   }
 };
@@ -110,6 +110,6 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
       nutritionLogs: user.nutritionLogs
     } });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 };
