@@ -14,10 +14,11 @@ export function AICoach() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [isVoiceOutputEnabled, setIsVoiceOutputEnabled] = useState(true);
+  const [isVoiceOutputEnabled, setIsVoiceOutputEnabled] = useState(false);
   const { fetchWorkouts, fetchPersonalRecords, fetchBodyMetrics, refreshProfile } = useAppContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('forgefit_ai_history');
@@ -75,6 +76,10 @@ export function AICoach() {
           }
           if (currentTranscript) {
             setInputText(prev => prev + (prev ? ' ' : '') + currentTranscript);
+            if (textareaRef.current) {
+              textareaRef.current.style.height = 'auto';
+              textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+            }
           }
         };
         
@@ -110,6 +115,10 @@ export function AICoach() {
 
     const userMessage = inputText.trim();
     setInputText('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // reset height on send
+    }
+    
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
@@ -142,6 +151,21 @@ export function AICoach() {
       speakText(errText);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputText(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
   };
 
@@ -188,7 +212,12 @@ export function AICoach() {
               {quickPrompts.map((prompt, idx) => (
                 <button 
                   key={idx}
-                  onClick={() => { setInputText(prompt); }}
+                  onClick={() => { 
+                    setInputText(prompt); 
+                    if (textareaRef.current) {
+                      textareaRef.current.style.height = 'auto';
+                    }
+                  }}
                   style={{ 
                     backgroundColor: 'transparent', 
                     border: '1px solid var(--border-color)', 
@@ -283,13 +312,13 @@ export function AICoach() {
           border: '1px solid #3f3f46', 
           borderRadius: '24px',
           padding: '8px 12px',
-          alignItems: 'center',
+          alignItems: 'flex-end', // ALIGN to flex-end so buttons stay bottom as textarea grows
           boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
           transition: 'border-color 0.2s',
           ...(isListening ? { borderColor: 'var(--accent)', boxShadow: '0 0 16px rgba(234, 179, 8, 0.2)' } : {})
         }}>
           
-          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginBottom: '4px' }}>
             <button 
               type="button" 
               onClick={() => {
@@ -334,21 +363,28 @@ export function AICoach() {
             </button>
           </div>
           
-          <input 
-            type="text" 
+          <textarea 
+            ref={textareaRef}
             placeholder={isListening ? "Listening..." : "Message Forge AI..."} 
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
             disabled={isLoading}
+            rows={1}
             style={{ 
               flexGrow: 1, 
               backgroundColor: 'transparent', 
               border: 'none', 
               color: '#fff',
-              padding: '8px 12px',
+              padding: '12px 12px',
               fontSize: '1rem',
               outline: 'none',
-              marginLeft: '4px'
+              marginLeft: '4px',
+              resize: 'none',
+              maxHeight: '200px',
+              minHeight: '44px',
+              fontFamily: 'inherit',
+              lineHeight: '1.5'
             }}
           />
           <button type="submit" disabled={isLoading || (!inputText.trim() && !isListening)} style={{ 
@@ -362,7 +398,9 @@ export function AICoach() {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: (isLoading || (!inputText.trim() && !isListening)) ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            marginBottom: '4px',
+            flexShrink: 0
           }}>
             <Send size={16} style={{ marginLeft: '2px' }} />
           </button>

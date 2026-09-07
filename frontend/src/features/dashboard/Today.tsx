@@ -3,11 +3,16 @@ import { CircularTracer } from '../../components/ui/Progress';
 import { Activity, Dumbbell, Utensils, Target, Droplets, Zap, Moon } from 'lucide-react';
 
 export function Today() {
-  const { workouts, userProfile } = useAppContext();
+  const { workouts, userProfile, bodyMetrics } = useAppContext();
   
   const todayDate = new Date().toDateString();
   const todaysWorkouts = workouts.filter(w => new Date(w.date).toDateString() === todayDate);
   const todaysNutrition = userProfile?.nutritionLogs || [];
+  const todaysMetrics = bodyMetrics.filter(m => new Date(m.date).toDateString() === todayDate);
+  
+  // Find if sleep was logged today
+  const todaysSleepLog = todaysMetrics.find(m => m.sleep !== null && m.sleep !== undefined);
+  const todaysSleep = todaysSleepLog ? todaysSleepLog.sleep : 0;
   
   const consumedCalories = todaysNutrition.reduce((acc, log) => acc + log.calories, 0);
   const consumedProtein = todaysNutrition.reduce((acc, log) => acc + log.protein, 0);
@@ -44,7 +49,7 @@ export function Today() {
           <div style={{ background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', padding: '12px', borderRadius: '50%' }}><Moon size={24} /></div>
           <div>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Sleep</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>6.5 <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>hrs</span></div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{todaysSleep} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>hrs</span></div>
           </div>
         </div>
       </div>

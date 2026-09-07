@@ -91,5 +91,6 @@ model BodyMetric {
   arms      Float?
   waist     Float?
   thighs    Float?
+  sleep     Float?
   date      DateTime @default(now())
 }
