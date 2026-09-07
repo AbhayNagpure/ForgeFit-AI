@@ -18,10 +18,20 @@ export class GeminiService {
       throw new Error("Message cannot be empty.");
     }
 
-    const systemInstruction = `You are ForgeFit AI, an elite autonomous personal fitness coach. Keep answers concise, factual, and data-driven.
-You have full access to the user's database. If the user asks to log, update, or retrieve ANY data (workouts, exercises, PRs, weight, goals, body metrics), YOU MUST use the provided tools to execute it for them. NEVER tell the user to do it manually if a tool exists.
-IMPORTANT: All weight units in the system MUST be in kilograms (kg). If the user provides a weight in lbs, you MUST convert it to kg (divide by 2.20462) before saving it to the database using the tools. Always display weights to the user in kg.
+    const systemInstruction = `You are ForgeFit AI, an elite, highly scientific personal fitness coach and nutritionist. You operate with the precision and depth of a world-class strength coach (like Dr. Mike Israetel or Dr. Andrew Huberman).
 
+CRITICAL DIRECTIVES FOR ACCURACY & QUALITY:
+1. NEVER GIVE "ROUGH" OR VAGUE ADVICE: If a user asks for a workout plan or meal plan without providing details, DO NOT guess. You MUST ask clarifying questions (e.g., "What is your primary goal?", "How many days a week can you train?", "Any injuries?").
+2. BE EXTREMELY SPECIFIC: When generating routines, provide exact exercises, exact sets, rep ranges, RPE (Rate of Perceived Exertion), and rest times in seconds. When talking about nutrition, provide exact macronutrient breakdowns, calorie targets, and specific meal examples.
+3. USE STRUCTURED FORMATTING: Always use Markdown tables for workout splits and meal plans. Use bold text for emphasis. Break long explanations into bulleted lists.
+4. BE SCIENTIFIC & DATA-DRIVEN: Base all your advice on established sports science principles (Progressive Overload, Volume Landmarks, CICO, Protein Synthesis).
+5. ACT AS AN AUTONOMOUS AGENT: You have full access to the user's database. If they ask to log or retrieve data, you MUST use your tools. Never tell the user to do it manually.
+
+IMPORTANT DATA RULES:
+- All weight units in the system MUST be in kilograms (kg). If the user provides a weight in lbs, you MUST convert it to kg (divide by 2.20462) before saving.
+- Always display weights to the user in kg, but you may mention the lbs equivalent in parentheses.
+
+USER CONTEXT:
 ${userContext}`;
 
     const tools = [{
@@ -84,7 +94,7 @@ ${userContext}`;
         },
         {
           name: 'logBodyMetrics',
-          description: 'Logs advanced body metrics (body fat, chest, arms, waist, thighs).',
+          description: 'Logs advanced body metrics (body fat, chest, arms, waist, thighs) or sleep (hours).',
           parameters: {
             type: Type.OBJECT,
             properties: {
@@ -92,7 +102,8 @@ ${userContext}`;
               chest: { type: Type.NUMBER },
               arms: { type: Type.NUMBER },
               waist: { type: Type.NUMBER },
-              thighs: { type: Type.NUMBER }
+              thighs: { type: Type.NUMBER },
+              sleep: { type: Type.NUMBER, description: 'Hours of sleep logged by the user' }
             }
           }
         },
@@ -201,7 +212,7 @@ ${userContext}`;
               functionResponseResult = JSON.stringify(prs);
               break;
             case 'logBodyMetrics':
-              const metric = await prisma.bodyMetric.create({ data: { userId, bodyFat: args.bodyFat, chest: args.chest, arms: args.arms, waist: args.waist, thighs: args.thighs } });
+              const metric = await prisma.bodyMetric.create({ data: { userId, bodyFat: args.bodyFat, chest: args.chest, arms: args.arms, waist: args.waist, thighs: args.thighs, sleep: args.sleep } });
               actionsTaken.push({ type: 'METRICS_LOGGED', data: metric });
               functionResponseResult = `Body metrics logged successfully.`;
               break;

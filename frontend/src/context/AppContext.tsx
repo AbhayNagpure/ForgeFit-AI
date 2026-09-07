@@ -25,6 +25,7 @@ export type BodyMetric = {
   arms?: number;
   waist?: number;
   thighs?: number;
+  sleep?: number;
   date: string;
 };
 
