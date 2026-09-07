@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { EXERCISE_LIBRARY, MUSCLE_GROUPS } from './exerciseData';
-import { Star, Sparkles, Shield, ChevronRight, Plus } from 'lucide-react';
-import { useAppContext } from '../../context/AppContext';
+import { Star, Sparkles, Shield, ChevronRight } from 'lucide-react';
+import { Mascot } from '../../components/ui/Mascot';
 
 export function Workouts() {
   const [selectedGroup, setSelectedGroup] = useState(MUSCLE_GROUPS[0]);
-  const { addWorkout } = useAppContext();
   
   const filteredExercises = EXERCISE_LIBRARY.filter(ex => ex.group === selectedGroup);
 
@@ -30,37 +29,27 @@ export function Workouts() {
     return acc;
   }, {} as Record<string, { items: typeof EXERCISE_LIBRARY, essentialCount: number }>);
 
-  const handleQuickLog = () => {
-    const defaultWorkout = {
-      name: `${selectedGroup} Routine`,
-      type: 'strength',
-      duration: 45
-    };
-    addWorkout(defaultWorkout);
-    alert(`Logged ${selectedGroup} Routine to your Progress!`);
-  };
-
   return (
     <div className="dashboard-layout" style={{ gap: '32px' }}>
       {/* Header & Sticky Filter Pills */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '24px', zIndex: 10, padding: '24px', background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', borderRadius: '24px', boxShadow: '0 12px 40px rgba(0,0,0,0.3)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <h2 className="page-title">Exercise Library</h2>
-            <p className="page-subtitle">Optimal form, target regions, and ratings.</p>
+        <div>
+          <h2 className="page-title">Exercise Library</h2>
+          <p className="page-subtitle">Optimal form, target regions, and ratings.</p>
+        </div>
+      
+        {/* Mascot Header Banner */}
+        <div style={{ background: 'var(--bg-glass)', borderRadius: '16px', border: '1px solid var(--border-glass)', padding: '20px', display: 'flex', alignItems: 'center', gap: '20px', overflow: 'hidden', position: 'relative' }}>
+          <div style={{ position: 'absolute', right: '-40px', top: '-40px', width: '200px', height: '200px', background: 'var(--accent)', filter: 'blur(80px)', opacity: 0.1, borderRadius: '50%' }} />
+          <div style={{ width: '80px', height: '80px', flexShrink: 0 }}>
+            <Mascot state="lifting" size={80} animated={false} />
           </div>
-          <button 
-            onClick={handleQuickLog}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '10px 16px', background: 'var(--accent)', color: '#fff',
-              border: 'none', borderRadius: '12px', fontWeight: 600,
-              cursor: 'pointer', boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
-            }}
-          >
-            <Plus size={18} />
-            Log {selectedGroup} Workout
-          </button>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '6px', color: '#fff' }}>AI Exercise Library</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
+              Here is the complete exercise library. When you talk to me in the AI Coach, I use these exercises to structure your workouts and log your progress. 
+            </p>
+          </div>
         </div>
         
         {/* Horizontal Scrollable Pills */}
