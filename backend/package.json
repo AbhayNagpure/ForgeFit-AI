@@ -1,13 +1,18 @@
 {
-  "name": "backend",
+  "name": "forgefit-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API and agent runtime for ForgeFit AI",
   "main": "index.js",
   "scripts": {
     "postinstall": "prisma generate",
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "test": "tsx --test src/**/*.test.ts",
+    "eval": "tsx src/evals/retrieval.eval.ts",
+    "eval:live": "tsx src/evals/agent.smoke.eval.ts",
+    "eval:approval": "tsx src/evals/approval.smoke.eval.ts",
+    "db:push": "prisma db push"
   },
   "keywords": [],
   "author": "",

@@ -1,21 +1,31 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
+import { z } from 'zod';
+import type { AuthRequest } from '../middleware/auth.middleware';
 
-const prisma = new PrismaClient();
+const bodyMetricSchema = z.object({
+  bodyFat: z.coerce.number().min(1).max(70).optional(),
+  chest: z.coerce.number().positive().max(300).optional(),
+  arms: z.coerce.number().positive().max(150).optional(),
+  waist: z.coerce.number().positive().max(300).optional(),
+  thighs: z.coerce.number().positive().max(200).optional(),
+  sleep: z.coerce.number().min(0).max(24).optional(),
+}).refine((data) => Object.values(data).some((value) => value !== undefined), 'At least one metric is required');
 
-export const addBodyMetric = async (req: Request, res: Response): Promise<void> => {
+export const addBodyMetric = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.userId;
-    const { bodyFat, chest, arms, waist, thighs } = req.body;
+    const userId = req.user!.userId;
+    const values = bodyMetricSchema.parse(req.body);
 
     const metric = await prisma.bodyMetric.create({
       data: {
         userId,
-        bodyFat: bodyFat ? Number(bodyFat) : null,
-        chest: chest ? Number(chest) : null,
-        arms: arms ? Number(arms) : null,
-        waist: waist ? Number(waist) : null,
-        thighs: thighs ? Number(thighs) : null,
+        bodyFat: values.bodyFat,
+        chest: values.chest,
+        arms: values.arms,
+        waist: values.waist,
+        thighs: values.thighs,
+        sleep: values.sleep,
       },
     });
 
@@ -26,9 +36,9 @@ export const addBodyMetric = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const getBodyMetrics = async (req: Request, res: Response): Promise<void> => {
+export const getBodyMetrics = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = req.user!.userId;
 
     const metrics = await prisma.bodyMetric.findMany({
       where: { userId },

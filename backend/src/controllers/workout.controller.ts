@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth.middleware';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 const workoutSchema = z.object({
   name: z.string(),
@@ -49,6 +47,7 @@ export const getWorkouts = async (req: AuthRequest, res: Response): Promise<void
     const workouts = await prisma.workout.findMany({
       where: { userId },
       orderBy: { date: 'desc' },
+      include: { exercises: { include: { completedSets: true }, orderBy: { order: 'asc' } } },
     });
     res.status(200).json({ workouts });
   } catch (error) {

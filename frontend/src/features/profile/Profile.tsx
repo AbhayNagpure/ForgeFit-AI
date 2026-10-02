@@ -3,13 +3,12 @@ import { Award, TrendingUp } from 'lucide-react';
 import { Settings } from '../settings/Settings';
 
 export function Profile() {
-  const { userProfile, workouts, personalRecords } = useAppContext();
+  const { userProfile, workouts, personalRecords, progressSummary } = useAppContext();
   
   const totalWorkouts = workouts.length;
   const hoursTrained = Math.round(workouts.reduce((acc, w) => acc + w.duration, 0) / 60);
 
-  // Mock streak calculation
-  const streak = totalWorkouts > 0 ? 3 : 0;
+  const streak = progressSummary?.currentStreak ?? 0;
   
   const bmi = userProfile?.weight && userProfile?.height 
     ? (userProfile.weight / Math.pow(userProfile.height / 100, 2)).toFixed(1)

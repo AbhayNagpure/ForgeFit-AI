@@ -3,8 +3,8 @@ import { User, Bell, Palette, LogOut, Info } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 export function Settings() {
-  const [theme, setTheme] = useState('dark');
-  const [notifications, setNotifications] = useState(true);
+  const [theme, setTheme] = useState(() => localStorage.getItem('forgefit_theme') || 'dark');
+  const [notifications, setNotifications] = useState(() => localStorage.getItem('forgefit_notifications') !== 'false');
   const { userProfile, logout } = useAppContext();
 
   return (
@@ -48,7 +48,12 @@ export function Settings() {
           </div>
           <select 
             value={theme}
-            onChange={(e) => setTheme(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTheme(value);
+              localStorage.setItem('forgefit_theme', value);
+              document.documentElement.dataset.theme = value;
+            }}
             style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '1rem', outline: 'none', textAlign: 'right', cursor: 'pointer' }}
           >
             <option value="dark">Hardcore Dark</option>
@@ -68,7 +73,10 @@ export function Settings() {
               <input 
                 type="checkbox" 
                 checked={notifications}
-                onChange={(e) => setNotifications(e.target.checked)}
+                onChange={(e) => {
+                  setNotifications(e.target.checked);
+                  localStorage.setItem('forgefit_notifications', String(e.target.checked));
+                }}
                 style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
               />
               <div style={{

@@ -1,184 +1,113 @@
+import { Activity, ArrowUpRight, CalendarDays, Dumbbell, Moon, Target, Utensils } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
-import { CircularTracer } from '../../components/ui/Progress';
-import { Activity, Dumbbell, Utensils, Target } from 'lucide-react';
-import { Mascot } from '../../components/ui/Mascot';
+
+const sameLocalDay = (value: string, target = new Date()) => new Date(value).toDateString() === target.toDateString();
 
 export function Today() {
-  const { workouts, userProfile, bodyMetrics } = useAppContext();
-  
-  const todayDate = new Date().toDateString();
-  const todaysWorkouts = workouts.filter(w => new Date(w.date).toDateString() === todayDate);
-  const todaysNutrition = userProfile?.nutritionLogs || [];
-  const todaysMetrics = bodyMetrics.filter(m => new Date(m.date).toDateString() === todayDate);
-  
-  // Find if sleep was logged today
-  const todaysSleepLog = todaysMetrics.find(m => m.sleep !== null && m.sleep !== undefined);
-  const todaysSleep = todaysSleepLog ? todaysSleepLog.sleep : 0;
-  
-  const consumedCalories = todaysNutrition.reduce((acc, log) => acc + log.calories, 0);
-  const consumedProtein = todaysNutrition.reduce((acc, log) => acc + log.protein, 0);
-  
-  // Fake calculated macros for UI density
-  const consumedCarbs = Math.round((consumedCalories * 0.4) / 4); // 40% carbs
-  const consumedFat = Math.round((consumedCalories * 0.3) / 9); // 30% fat
-  
-  const targetCalories = 2500;
-  const targetProtein = 160;
-  const targetCarbs = 250;
-  const targetFat = 80;
+  const { workouts, userProfile, bodyMetrics, progressSummary } = useAppContext();
+  const todaysWorkouts = workouts.filter((workout) => sameLocalDay(workout.date));
+  const todaysNutrition = (userProfile?.nutritionLogs ?? []).filter((entry) => sameLocalDay(entry.date));
+  const todaysMetric = bodyMetrics.find((metric) => sameLocalDay(metric.date));
+  const calories = todaysNutrition.reduce((sum, entry) => sum + entry.calories, 0);
+  const protein = todaysNutrition.reduce((sum, entry) => sum + entry.protein, 0);
+  const trainingMinutes = todaysWorkouts.reduce((sum, workout) => sum + workout.duration, 0);
+  const calorieTarget = userProfile?.dailyCalories || null;
+  const proteinTarget = userProfile?.dailyProtein || null;
+  const calorieProgress = calorieTarget ? Math.min(100, Math.round((calories / calorieTarget) * 100)) : 0;
+  const proteinProgress = proteinTarget ? Math.min(100, Math.round((protein / proteinTarget) * 100)) : 0;
+  const firstName = userProfile?.name?.split(' ')[0] || 'Athlete';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '24px' }}>
-      
-      {/* Quick Stats Header */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '8px' }}>
-        <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Mascot state="running" size={48} animated={false} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Active Energy</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{todaysWorkouts.reduce((acc, w) => acc + (w.duration * 8), 0)} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>kcal</span></div>
-          </div>
+    <div className="page-stack">
+      <section className="hero-panel">
+        <div>
+          <div className="eyebrow"><CalendarDays size={14} /> {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+          <h2>Good to see you, {firstName}.</h2>
+          <p>
+            {todaysWorkouts.length
+              ? `You have logged ${trainingMinutes} training minutes today. Keep the next decision simple.`
+              : 'No training is logged today. Start when you are ready, or use Forge to adapt the plan.'}
+          </p>
         </div>
-        <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Mascot state="hydration" size={48} animated={false} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Water Intake</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>1.2 <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>/ 3.0 L</span></div>
-          </div>
+        <div className="hero-score">
+          <span>{progressSummary?.currentStreak ?? 0}</span>
+          <small>day streak</small>
         </div>
-        <div style={{ background: 'var(--bg-glass)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Mascot state="sleep" size={48} animated={false} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Sleep</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{todaysSleep} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#71717a' }}>hrs</span></div>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-        
-        {/* Column 1: Energy & Macros */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Target size={18} /> Energy & Macros
-          </h2>
-          
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <CircularTracer value={consumedCalories} max={targetCalories} label="kcal" color="var(--accent)" />
-          </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 16px', fontSize: '0.875rem', marginTop: '-16px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <strong style={{ display: 'block', fontSize: '1.25rem', color: 'var(--text-primary)' }}>{consumedCalories}</strong>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Eaten</span>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <strong style={{ display: 'block', fontSize: '1.25rem', color: 'var(--text-primary)' }}>{Math.max(0, targetCalories - consumedCalories)}</strong>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Remaining</span>
-            </div>
-          </div>
+      <section className="metric-grid">
+        <article className="metric-card">
+          <div className="metric-icon"><Activity size={19} /></div>
+          <div><span>Training today</span><strong>{trainingMinutes || '—'} {trainingMinutes ? <small>min</small> : null}</strong></div>
+        </article>
+        <article className="metric-card">
+          <div className="metric-icon violet"><Moon size={19} /></div>
+          <div><span>Sleep logged</span><strong>{todaysMetric?.sleep ?? '—'} {todaysMetric?.sleep ? <small>hours</small> : null}</strong></div>
+        </article>
+        <article className="metric-card">
+          <div className="metric-icon blue"><Utensils size={19} /></div>
+          <div><span>Meals logged</span><strong>{todaysNutrition.length}</strong></div>
+        </article>
+        <article className="metric-card">
+          <div className="metric-icon coral"><Target size={19} /></div>
+          <div><span>Weekly sessions</span><strong>{workouts.filter((workout) => Date.now() - new Date(workout.date).getTime() < 7 * 86_400_000).length}</strong></div>
+        </article>
+      </section>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '8px' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 600 }}>Protein</span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{consumedProtein} / {targetProtein} g</span>
-              </div>
-              <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min(100, (consumedProtein / targetProtein) * 100)}%`, height: '100%', background: '#3b82f6', borderRadius: '4px' }} />
-              </div>
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 600 }}>Carbs</span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{consumedCarbs} / {targetCarbs} g</span>
-              </div>
-              <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min(100, (consumedCarbs / targetCarbs) * 100)}%`, height: '100%', background: '#eab308', borderRadius: '4px' }} />
-              </div>
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 600 }}>Fat</span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{consumedFat} / {targetFat} g</span>
-              </div>
-              <div style={{ width: '100%', height: '6px', background: '#27272a', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min(100, (consumedFat / targetFat) * 100)}%`, height: '100%', background: '#ef4444', borderRadius: '4px' }} />
-              </div>
-            </div>
+      <section className="content-grid content-grid-wide">
+        <article className="surface-card nutrition-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Daily fuel</span><h3>Nutrition targets</h3></div>
+            <Utensils size={20} />
           </div>
+          <div className="nutrition-total">
+            <div><strong>{calories.toLocaleString()}</strong><span>{calorieTarget ? `of ${calorieTarget.toLocaleString()} kcal` : 'kcal logged'}</span></div>
+            <span className="progress-number">{calorieTarget ? `${calorieProgress}%` : 'No target'}</span>
+          </div>
+          <div className="track"><span style={{ width: `${calorieProgress}%` }} /></div>
+          <div className="macro-row">
+            <div><span>Protein</span><strong>{protein}g {proteinTarget ? `/ ${proteinTarget}g` : ''}</strong></div>
+            <div className="mini-track"><span style={{ width: `${proteinProgress}%` }} /></div>
+          </div>
+          {!calorieTarget || !proteinTarget ? <p className="helper-text">Ask Forge to calculate and save targets after it confirms your goal and baseline.</p> : null}
+        </article>
+
+        <article className="surface-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Today</span><h3>Meals</h3></div>
+            <span className="count-pill">{todaysNutrition.length}</span>
+          </div>
+          <div className="compact-list">
+            {todaysNutrition.length ? todaysNutrition.map((entry) => (
+              <div className="compact-row" key={entry.id}>
+                <div><strong>{entry.foodName}</strong><span>{entry.protein}g protein · {entry.source === 'ai_estimate' ? `AI estimate${entry.confidence ? ` · ${Math.round(entry.confidence * 100)}% confidence` : ''}` : 'label data'}</span></div>
+                <b>{entry.calories} kcal</b>
+              </div>
+            )) : <EmptyState icon={<Utensils size={22} />} title="Nothing logged yet" body="Tell Forge what you ate and include the portion for a better estimate." />}
+          </div>
+        </article>
+      </section>
+
+      <section className="surface-card">
+        <div className="section-heading">
+          <div><span className="eyebrow">Session log</span><h3>Today’s training</h3></div>
+          <Dumbbell size={20} />
         </div>
-
-        {/* Column 2: Meals Log */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Utensils size={18} /> Meals Log
-          </h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexGrow: 1 }}>
-            {todaysNutrition.length > 0 ? (
-              todaysNutrition.map((log: any, idx: number) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-dark)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{log.foodItem}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>{log.protein}g protein • {Math.round(log.calories * 0.4 / 4)}g carbs</div>
-                  </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent)' }}>
-                    {log.calories} <span style={{ fontSize: '0.75rem', color: '#71717a', fontWeight: 500 }}>kcal</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#71717a', background: 'var(--bg-dark)', borderRadius: 'var(--radius)', padding: '32px', border: '1px dashed var(--border-color)' }}>
-                <Utensils size={32} style={{ opacity: 0.3, marginBottom: '12px' }} />
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>No Meals Logged</span>
-                <span style={{ fontSize: '0.75rem', marginTop: '4px', textAlign: 'center' }}>Tell Forge AI what you ate to log it here.</span>
-              </div>
-            )}
-          </div>
+        <div className="session-list">
+          {todaysWorkouts.length ? todaysWorkouts.map((workout) => (
+            <div className="session-row" key={workout.id}>
+              <div className="session-mark"><Dumbbell size={18} /></div>
+              <div className="session-main"><strong>{workout.name}</strong><span>{workout.type} · {workout.exercises?.length ?? 0} exercises</span></div>
+              <strong>{workout.duration} min</strong>
+              <ArrowUpRight size={17} className="muted-icon" />
+            </div>
+          )) : <EmptyState icon={<Dumbbell size={22} />} title="No session recorded" body="A rest day is valid. If you trained, Forge can log the session in one message." />}
         </div>
-
-        {/* Column 3: Training Log */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={18} /> Training Log
-          </h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexGrow: 1 }}>
-            {todaysWorkouts.length > 0 ? (
-              todaysWorkouts.map(w => (
-                <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-dark)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(234, 179, 8, 0.1)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Dumbbell size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{w.name}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>{w.type.replace('_', ' ')}</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                    {w.duration} <span style={{ fontSize: '0.75rem', color: '#71717a', fontWeight: 500 }}>min</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#71717a', background: 'var(--bg-dark)', borderRadius: 'var(--radius)', padding: '32px', border: '1px dashed var(--border-color)' }}>
-                <Dumbbell size={32} style={{ opacity: 0.3, marginBottom: '12px' }} />
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Rest Day</span>
-                <span style={{ fontSize: '0.75rem', marginTop: '4px', textAlign: 'center' }}>No workouts recorded for today.</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-      </div>
+      </section>
     </div>
   );
+}
+
+function EmptyState({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+  return <div className="empty-state"><div>{icon}</div><strong>{title}</strong><span>{body}</span></div>;
 }

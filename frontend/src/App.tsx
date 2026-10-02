@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Workouts } from './features/workouts/Workouts';
@@ -12,11 +12,17 @@ import { Cpu } from 'lucide-react';
 import './index.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('coach');
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('forgefit_active_tab') || 'coach');
   const { isAuthenticated, isLoadingAuth } = useAppContext();
 
+  useEffect(() => {
+    localStorage.setItem('forgefit_active_tab', activeTab);
+    const savedTheme = localStorage.getItem('forgefit_theme');
+    if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  }, [activeTab]);
+
   if (isLoadingAuth) {
-    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-dark)' }}>
+    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-gradient-4)' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--accent)' }}>
         <Cpu size={48} className="animate-pulse" />
         <span style={{ fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>Initializing Forge AI</span>

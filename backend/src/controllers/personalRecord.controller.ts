@@ -1,24 +1,25 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
+import { z } from 'zod';
+import type { AuthRequest } from '../middleware/auth.middleware';
 
-const prisma = new PrismaClient();
+const personalRecordSchema = z.object({
+  exerciseName: z.string().trim().min(1).max(120),
+  weight: z.coerce.number().nonnegative().max(1000),
+  reps: z.coerce.number().int().positive().max(1000).optional(),
+});
 
-export const addPersonalRecord = async (req: Request, res: Response): Promise<void> => {
+export const addPersonalRecord = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.userId;
-    const { exerciseName, weight, reps } = req.body;
-
-    if (!exerciseName || weight === undefined) {
-      res.status(400).json({ message: 'Exercise name and weight are required' });
-      return;
-    }
+    const userId = req.user!.userId;
+    const { exerciseName, weight, reps } = personalRecordSchema.parse(req.body);
 
     const pr = await prisma.personalRecord.create({
       data: {
         userId,
         exerciseName,
-        weight: Number(weight),
-        reps: reps ? Number(reps) : null,
+        weight,
+        reps: reps ?? null,
       },
     });
 
@@ -29,9 +30,9 @@ export const addPersonalRecord = async (req: Request, res: Response): Promise<vo
   }
 };
 
-export const getPersonalRecords = async (req: Request, res: Response): Promise<void> => {
+export const getPersonalRecords = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.userId;
+    const userId = req.user!.userId;
 
     const prs = await prisma.personalRecord.findMany({
       where: { userId },
@@ -45,10 +46,10 @@ export const getPersonalRecords = async (req: Request, res: Response): Promise<v
   }
 };
 
-export const deletePersonalRecord = async (req: Request, res: Response): Promise<void> => {
+export const deletePersonalRecord = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = (req as any).user.userId;
+    const userId = req.user!.userId;
 
     const pr = await prisma.personalRecord.findUnique({ where: { id: id as string } });
 

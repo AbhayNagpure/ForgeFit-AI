@@ -8,6 +8,13 @@ export type Workout = {
   type: string;
   duration: number;
   date: string;
+  exercises?: Array<{
+    id: string;
+    name: string;
+    sets: number;
+    reps: number;
+    weight?: number;
+  }>;
 };
 
 export type PersonalRecord = {
@@ -43,7 +50,18 @@ export type UserProfile = {
   experienceLevel?: string;
   equipment?: string;
   workoutDays?: number;
-  nutritionLogs?: { id: string; foodName: string; calories: number; protein: number; date: string }[];
+  nutritionLogs?: { id: string; foodName: string; calories: number; protein: number; carbs?: number; fat?: number; source: string; confidence?: number; date: string }[];
+};
+
+export type ProgressSummary = {
+  currentStreak: number;
+  totalWorkouts: number;
+  totalMinutes: number;
+  weightTrend: { current: number | null; change: number | null };
+  weightHistory: Array<{ date: string; weight: number }>;
+  weeklyMinutes: Array<{ label: string; minutes: number }>;
+  personalRecords: PersonalRecord[];
+  bodyMetrics: BodyMetric[];
 };
 
 type AppContextType = {
@@ -61,6 +79,9 @@ type AppContextType = {
   fetchPersonalRecords: () => Promise<void>;
   fetchBodyMetrics: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  progressSummary: ProgressSummary | null;
+  fetchProgressSummary: () => Promise<void>;
+  isLoadingData: boolean;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -72,10 +93,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
 
   const fetchWorkouts = async () => {
     try {
-      const data = await apiRequest('/workouts');
+      const data = await apiRequest<{ workouts: Workout[] }>('/workouts');
       setWorkouts(data.workouts || []);
     } catch (err) {
       console.error('Failed to fetch workouts:', err);
@@ -84,7 +107,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const fetchPersonalRecords = async () => {
     try {
-      const data = await apiRequest('/personal-records');
+      const data = await apiRequest<PersonalRecord[]>('/personal-records');
       setPersonalRecords(data || []);
     } catch (err) {
       console.error('Failed to fetch PRs:', err);
@@ -93,11 +116,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const fetchBodyMetrics = async () => {
     try {
-      const data = await apiRequest('/body-metrics');
+      const data = await apiRequest<BodyMetric[]>('/body-metrics');
       setBodyMetrics(data || []);
     } catch (err) {
       console.error('Failed to fetch metrics:', err);
     }
+  };
+
+  const fetchProgressSummary = async () => {
+    try {
+      const data = await apiRequest<ProgressSummary>('/progress/summary');
+      setProgressSummary(data);
+    } catch (err) {
+      console.error('Failed to fetch progress summary:', err);
+    }
+  };
+
+  const fetchAppData = async () => {
+    setIsLoadingData(true);
+    await Promise.all([fetchWorkouts(), fetchPersonalRecords(), fetchBodyMetrics(), fetchProgressSummary()]);
+    setIsLoadingData(false);
   };
 
   const verifyAuth = useCallback(async () => {
@@ -109,12 +147,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const data = await apiRequest('/auth/me');
+      const data = await apiRequest<{ user: UserProfile }>('/auth/me');
       setUserProfile(data.user);
       setIsAuthenticated(true);
-      fetchWorkouts();
-      fetchPersonalRecords();
-      fetchBodyMetrics();
+      await fetchAppData();
     } catch (err) {
       console.error('Auth check failed:', err);
       removeAuthToken();
@@ -128,6 +164,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     verifyAuth();
   }, [verifyAuth]);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setIsAuthenticated(false);
+      setUserProfile(null);
+    };
+    window.addEventListener('forgefit:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('forgefit:unauthorized', handleUnauthorized);
+  }, []);
+
   const login = (token: string) => {
     setAuthToken(token);
     verifyAuth();
@@ -140,15 +185,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setWorkouts([]);
     setPersonalRecords([]);
     setBodyMetrics([]);
+    setProgressSummary(null);
   };
 
   const addWorkout = async (newWorkout: Omit<Workout, 'id' | 'date'>) => {
     try {
-      const data = await apiRequest('/workouts', {
+      const data = await apiRequest<{ workout: Workout }>('/workouts', {
         method: 'POST',
         body: JSON.stringify(newWorkout)
       });
-      setWorkouts([data.workout, ...workouts]);
+      setWorkouts((current) => [data.workout, ...current]);
+      await fetchProgressSummary();
     } catch (err) {
       console.error('Failed to add workout:', err);
     }
@@ -173,13 +220,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       fetchWorkouts,
       fetchPersonalRecords,
       fetchBodyMetrics,
-      refreshProfile: verifyAuth
+      refreshProfile: verifyAuth,
+      progressSummary,
+      fetchProgressSummary,
+      isLoadingData
     }}>
       {children}
     </AppContext.Provider>
   );
 }
 
+// oxlint-disable-next-line react/only-export-components -- colocated provider hook is the public context API
 export function useAppContext() {
   const context = useContext(AppContext);
   if (context === undefined) {

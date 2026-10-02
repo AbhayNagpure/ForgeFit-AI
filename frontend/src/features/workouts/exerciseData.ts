@@ -122,7 +122,7 @@ export const EXERCISE_LIBRARY = [
   { group: 'Triceps', subGroup: '🔸 Lateral Head Exercises', name: 'Dumbbell Kickback', rating: 'Recommended', target: 'Lateral Head', tips: ['Keep upper arm parallel to floor'], videoPlaceholder: '/animations/dumbbell_kickback.mp4' },
 
   // ⚪ Medial Head Exercises
-  { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Reverse-Grip Cable Pushdown', rating: 'Essential', target: 'Medial Head', tips: ['Underhand grip', 'Keep elbows tucked', 'Slow, controlled reps'], videoPlaceholder: '/gifs/0012.gif' },
+  { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Reverse-Grip Cable Pushdown', rating: 'Essential', target: 'Medial Head', tips: ['Underhand grip', 'Keep elbows tucked', 'Slow, controlled reps'], videoPlaceholder: '/animations/cable_triceps_pushdown.mp4' },
   { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Close Grip Push-Ups', rating: 'Recommended', target: 'Medial Head, Chest', tips: ['Hands close together', 'Keep elbows close', 'Lower chest between hands'], videoPlaceholder: '/animations/close_grip_push_ups.mp4' },
   { group: 'Triceps', subGroup: '⚪ Medial Head Exercises', name: 'Dumbbell One Arm Triceps Extension', rating: 'Recommended', target: 'Medial Head', tips: ['Focus on full extension', 'Great for correcting imbalances'], videoPlaceholder: '/animations/dumbbell_one_arm_triceps_extension.mp4' },
 

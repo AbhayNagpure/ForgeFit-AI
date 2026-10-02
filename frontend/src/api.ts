@@ -12,7 +12,20 @@ export function removeAuthToken() {
   localStorage.removeItem('forgefit_auth_token');
 }
 
-export async function apiRequest(endpoint: string, options: RequestInit = {}) {
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  details?: unknown;
+
+  constructor(message: string, status: number, code?: string, details?: unknown) {
+    super(message);
+    this.status = status;
+    this.code = code;
+    this.details = details;
+  }
+}
+
+export async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getAuthToken();
   
   const headers: Record<string, string> = {
@@ -29,11 +42,16 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     headers,
   });
 
-  const data = await response.json();
+  const contentType = response.headers.get('content-type') || '';
+  const data = contentType.includes('application/json') ? await response.json() : { error: await response.text() };
 
   if (!response.ok) {
-    throw new Error(data.error || 'Something went wrong');
+    if (response.status === 401 && token) {
+      removeAuthToken();
+      window.dispatchEvent(new CustomEvent('forgefit:unauthorized'));
+    }
+    throw new ApiError(data.error || 'Something went wrong', response.status, data.code, data.details);
   }
 
-  return data;
+  return data as T;
 }

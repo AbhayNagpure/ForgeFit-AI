@@ -1,124 +1,82 @@
+import { Activity, Clock3, Dumbbell, Flame, Scale, Trophy } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
-import { Flame, Scale, Dumbbell, Trophy, TrendingUp, Medal, Activity } from 'lucide-react';
 
 export function ProgressTracking() {
-  const { userProfile, workouts, personalRecords } = useAppContext();
-
-  const currentStreak = 12; // In a real app, you'd calculate this from workouts
-  const totalWorkouts = workouts.length;
-  const currentWeight = userProfile?.weight || 75;
-  const weightChange = -2.5; 
-  
-  // Format PRs nicely from the backend
-  const formattedPRs = personalRecords.slice(0, 5).map((pr, idx) => ({
-    name: pr.exerciseName,
-    weight: `${pr.weight} kg`,
-    date: new Date(pr.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    icon: idx % 2 === 0 ? Dumbbell : Trophy,
-    color: idx % 3 === 0 ? '#ef4444' : idx % 3 === 1 ? '#3b82f6' : '#eab308'
-  }));
+  const { progressSummary } = useAppContext();
+  const summary = progressSummary;
+  const maxMinutes = Math.max(1, ...(summary?.weeklyMinutes.map((week) => week.minutes) ?? [1]));
 
   return (
-    <div className="dashboard-layout" style={{ gap: '24px' }}>
-      
-      {/* Top Highlights: Stats Grid */}
-      <div className="stats-grid">
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(249, 115, 22, 0.2)', color: '#f97316' }}>
-            <Flame size={28} />
+    <div className="page-stack progress-page">
+      <section className="metric-grid metric-grid-three progress-metrics">
+        <Metric icon={<Flame size={19} />} label="Current streak" value={`${summary?.currentStreak ?? 0}`} unit="days" />
+        <Metric icon={<Dumbbell size={19} />} label="Completed workouts" value={`${summary?.totalWorkouts ?? 0}`} unit="total" tone="blue" />
+        <Metric icon={<Clock3 size={19} />} label="Training time" value={`${Math.round((summary?.totalMinutes ?? 0) / 60)}`} unit="hours" tone="violet" />
+      </section>
+
+      <section className="content-grid content-grid-wide">
+        <article className="surface-card chart-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Last eight weeks</span><h3>Training minutes</h3></div>
+            <Activity size={20} />
           </div>
-          <div>
-            <div className="stat-label">Current Streak</div>
-            <div className="stat-value" style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-              {currentStreak} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>Days</span>
+          <div className="chart-scroll">
+            <div className="bar-chart" aria-label="Weekly training minutes">
+              {(summary?.weeklyMinutes ?? []).map((week) => (
+                <div className="bar-column" key={week.label}>
+                  <span className="bar-value">{week.minutes || '0'}</span>
+                  <div className="bar-shell"><div style={{ height: week.minutes ? `${Math.max(4, (week.minutes / maxMinutes) * 100)}%` : '0%' }} /></div>
+                  <span>{week.label}</span>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+          <span className="swipe-hint">Swipe to see all weeks →</span>
+          {!summary?.weeklyMinutes.some((week) => week.minutes > 0) ? <p className="helper-text">Complete workouts to build your real training trend.</p> : null}
+        </article>
 
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}>
-            <Scale size={28} />
+        <article className="surface-card weight-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Recorded trend</span><h3>Body weight</h3></div>
+            <Scale size={20} />
           </div>
-          <div>
-            <div className="stat-label">Current Weight</div>
-            <div className="stat-value" style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-              {currentWeight} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>kg</span>
+          <div className="weight-number">
+            <strong>{summary?.weightTrend.current ?? '—'}</strong>
+            <span>{summary?.weightTrend.current ? 'kg' : 'Not logged'}</span>
+          </div>
+          {summary?.weightTrend.change !== null && summary?.weightTrend.change !== undefined ? (
+            <div className={`trend-chip ${summary.weightTrend.change > 0 ? 'up' : 'down'}`}>
+              {summary.weightTrend.change > 0 ? '+' : ''}{summary.weightTrend.change} kg across recorded history
             </div>
-            <div className="stat-change" style={{ color: weightChange <= 0 ? 'var(--accent)' : '#ef4444' }}>
-              <TrendingUp size={12} style={{ marginRight: '4px', transform: weightChange <= 0 ? 'rotate(180deg)' : 'none' }} />
-              {Math.abs(weightChange)} kg this month
-            </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
-            <Medal size={28} />
-          </div>
-          <div>
-            <div className="stat-label">Total Workouts</div>
-            <div className="stat-value">{totalWorkouts}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-columns">
-        <div className="card chart-section" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={18} /> Volume Progression
-          </h2>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: '12px', paddingTop: '32px' }}>
-            {[30, 45, 40, 60, 55, 80, 100].map((height, i) => (
-              <div 
-                key={i} 
-                style={{ 
-                  flex: 1, 
-                  height: `${height}%`, 
-                  background: i === 6 ? 'linear-gradient(to top, var(--accent), #6ee7b7)' : 'rgba(255, 255, 255, 0.1)', 
-                  borderRadius: '6px 6px 0 0',
-                  transition: 'height 0.5s ease',
-                  position: 'relative'
-                }}
-              >
-                {i === 6 && (
-                  <div style={{ position: 'absolute', top: '-24px', width: '100%', textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)' }}>
-                    Peak
-                  </div>
-                )}
-              </div>
+          ) : <p className="helper-text">Log weight consistently to reveal a trend. Daily fluctuations are normal.</p>}
+          <div className="weight-points">
+            {(summary?.weightHistory.slice(-8) ?? []).map((entry) => (
+              <div key={entry.date}><span>{entry.weight}</span><small>{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</small></div>
             ))}
           </div>
+        </article>
+      </section>
+
+      <section className="surface-card records-section">
+        <div className="section-heading">
+          <div><span className="eyebrow">Strength milestones</span><h3>Recent personal records</h3></div>
+          <Trophy size={20} />
         </div>
-        
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Trophy size={18} /> Personal Records
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {formattedPRs.length === 0 && (
-              <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '1rem' }}>
-                No PRs logged yet. Tell your AI Coach to log one!
-              </div>
-            )}
-            {formattedPRs.map((pr, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ padding: '8px', borderRadius: '8px', background: `${pr.color}20`, color: pr.color }}>
-                    <pr.icon size={20} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{pr.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{pr.date}</div>
-                  </div>
-                </div>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                  {pr.weight}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="records-grid">
+          {summary?.personalRecords.length ? summary.personalRecords.map((record) => (
+            <article className="record-card" key={record.id}>
+              <Trophy size={17} />
+              <span>{record.exerciseName}</span>
+              <strong>{record.weight} kg</strong>
+              <small>{record.reps ? `${record.reps} reps · ` : ''}{new Date(record.date).toLocaleDateString()}</small>
+            </article>
+          )) : <div className="empty-inline">No records yet. Forge can record a PR when you report one.</div>}
         </div>
-      </div>
+      </section>
     </div>
   );
+}
+
+function Metric({ icon, label, value, unit, tone = '' }: { icon: React.ReactNode; label: string; value: string; unit: string; tone?: string }) {
+  return <article className="metric-card"><div className={`metric-icon ${tone}`}>{icon}</div><div><span>{label}</span><strong>{value} <small>{unit}</small></strong></div></article>;
 }

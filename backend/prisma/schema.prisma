@@ -30,6 +30,10 @@ model User {
   personalRecords PersonalRecord[]
   bodyMetrics     BodyMetric[]
   nutritionLogs   NutritionLog[]
+  conversations   Conversation[]
+  agentRuns        AgentRun[]
+  pendingActions   PendingAction[]
+  memories         UserMemory[]
 }
 
 model NutritionLog {
@@ -39,6 +43,10 @@ model NutritionLog {
   foodName  String
   calories  Int
   protein   Int
+  carbs     Int?
+  fat       Int?
+  source    String   @default("manual")
+  confidence Float?
   date      DateTime @default(now())
 }
 
@@ -70,6 +78,22 @@ model WorkoutExercise {
   sets      Int
   reps      Int
   weight    Float?   
+  order     Int      @default(0)
+  notes     String?
+  completedSets WorkoutSet[]
+}
+
+model WorkoutSet {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  exerciseId String          @db.ObjectId
+  exercise   WorkoutExercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  setNumber  Int
+  reps       Int
+  weight     Float?
+  rpe        Float?
+  rir        Int?
+  completed  Boolean         @default(true)
+  createdAt  DateTime        @default(now())
 }
 
 model PersonalRecord {
@@ -93,4 +117,91 @@ model BodyMetric {
   thighs    Float?
   sleep     Float?
   date      DateTime @default(now())
+}
+
+model Conversation {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String        @db.ObjectId
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  summary   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+  runs      AgentRun[]
+  pendingActions PendingAction[]
+}
+
+model ChatMessage {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+}
+
+model AgentRun {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String?       @db.ObjectId
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  requestId      String        @unique
+  model          String
+  status         String        @default("running")
+  input          String
+  output         String?
+  turnCount      Int           @default(0)
+  inputTokens    Int?
+  outputTokens   Int?
+  durationMs     Int?
+  error          String?
+  createdAt      DateTime      @default(now())
+  completedAt    DateTime?
+  toolExecutions ToolExecution[]
+}
+
+model ToolExecution {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  agentRunId       String   @db.ObjectId
+  agentRun         AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+  name             String
+  arguments        Json
+  result           Json?
+  status           String
+  durationMs       Int?
+  requiresApproval Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}
+
+model PendingAction {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String?       @db.ObjectId
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  toolName       String
+  arguments      Json
+  description    String
+  status         String        @default("pending")
+  expiresAt      DateTime
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+}
+
+model UserMemory {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key        String
+  value      String
+  category   String   @default("preference")
+  confidence Float    @default(1)
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, key])
 }

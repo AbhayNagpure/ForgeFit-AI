@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth.middleware';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
+import { env } from '../config/env';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -36,7 +35,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         goal,
       },
     });
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'fallback_secret_key', { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ user: { id: user.id, email: user.email, name: user.name }, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -60,7 +59,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({ error: 'Invalid email or password' });
       return;
     }
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'fallback_secret_key', { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '7d' });
     res.status(200).json({ user: { id: user.id, email: user.email, name: user.name }, token });
   } catch (error) {
     if (error instanceof z.ZodError) {

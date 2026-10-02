@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Activity, Dumbbell, LineChart, User, LogOut, Cpu, Calendar } from 'lucide-react';
+import { Activity, Dumbbell, LineChart, User, LogOut, Sparkles, Calendar } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 type SidebarProps = {
@@ -8,7 +8,7 @@ type SidebarProps = {
 };
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
-  const { logout } = useAppContext();
+  const { logout, userProfile } = useAppContext();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -18,10 +18,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   }, []);
   
   const navItems = [
-    { id: 'coach', label: 'Forge AI', icon: Cpu, isAI: true },
+    { id: 'coach', label: 'Forge AI', icon: Sparkles, isAI: true },
     { id: 'today', label: 'Today', icon: Calendar },
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'workouts', label: 'Workouts', icon: Dumbbell },
+    { id: 'workouts', label: 'Training', icon: Dumbbell },
     { id: 'progress', label: 'Progress', icon: LineChart }
   ];
 
@@ -30,8 +30,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       <div className="sidebar-main">
         {!isMobile && (
           <div className="sidebar-brand">
-            <Activity size={24} color="var(--accent)" />
-            <span>ForgeFit</span>
+            <div className="brand-mark"><Activity size={18} /></div>
+            <span>Forge<span>Fit</span></span>
           </div>
         )}
         <nav className="sidebar-nav">
@@ -50,6 +50,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
       {!isMobile && (
         <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div>{userProfile?.name?.slice(0, 1).toUpperCase() || 'A'}</div>
+            <span><strong>{userProfile?.name || 'Athlete'}</strong><small>{userProfile?.goal || 'Building consistency'}</small></span>
+          </div>
           <button 
             className="nav-link signout-btn"
             onClick={logout}
